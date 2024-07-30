@@ -18,9 +18,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Separator } from '@/components/ui/separator'
-
-const passwordValidationRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+import { useToast } from '@/components/ui/use-toast'
+import { PASSWORD_VALIDATION_REGEX } from '@/constants'
+import { trpc } from '@/server/client'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z
   .object({
@@ -34,7 +35,7 @@ const formSchema = z
       .string()
       .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
       .max(16, { message: 'La contraseña no puede tener más de 16 caracteres' })
-      .regex(passwordValidationRegex, {
+      .regex(PASSWORD_VALIDATION_REGEX, {
         message:
           'Tu contraseña no es válida. Debe contener al menos una letra minúscula, una letra mayúscula, un dígito y un carácter especial'
       }),
@@ -42,7 +43,7 @@ const formSchema = z
       .string()
       .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
       .max(16)
-      .regex(passwordValidationRegex, {
+      .regex(PASSWORD_VALIDATION_REGEX, {
         message:
           'Tu contraseña no es válida. Debe contener al menos una letra minúscula, una letra mayúscula, un dígito y un carácter especial'
       }),
@@ -54,20 +55,38 @@ const formSchema = z
   })
 
 export const RegisterForm: React.FC = () => {
+  const router = useRouter()
+  const { toast } = useToast()
+
+  const createUser = trpc.users.create.useMutation({
+    onSuccess: () => {
+      toast({
+        description: 'Cuenta creada exitosamente'
+      })
+      router.push('/iniciar-sesion')
+    },
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        description: error.message
+      })
+    }
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      firstName: 'Christian Gabriel',
+      lastName: 'Torres Martinez',
+      email: 'web.christian.dev@gmail.com',
+      password: 'KtmN$Pqx1',
+      confirmPassword: 'KtmN$Pqx1',
       role: 'USER'
     }
   })
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
+    createUser.mutate(values)
   }
 
   return (
