@@ -1,8 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandGoogle, IconBrandInstagram } from '@tabler/icons-react'
+import { IconBrandGoogle, IconBrandInstagram, IconX } from '@tabler/icons-react'
 import Link from 'next/link'
+import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -18,31 +19,39 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { Separator } from '@/components/ui/separator'
-
-const formSchema = z.object({
-  username: z.string().min(1, { message: 'El nombre de usuario es requerido' }),
-  password: z
-    .string()
-    .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
-    .max(16, { message: 'La contraseña no puede tener más de 16 caracteres' })
-})
+import { authenticate } from '@/lib/actions'
+import { loginFormSchema as formSchema } from '@/types/schemas'
+import { useFormState } from 'react-dom'
 
 export const LoginForm: React.FC = () => {
+  const [state, formAction, isPending] = useFormState(authenticate, {
+    message: ''
+  })
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: '',
-      password: ''
+      username: 'web.christian.dev@gmail.com',
+      password: 'KtmN$Pqx1',
+      ...(state?.fields ?? {})
     }
   })
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
-  }
+  const formRef = useRef<HTMLFormElement>(null)
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+      <form
+        ref={formRef}
+        action={formAction}
+        onSubmit={(evt) => {
+          evt.preventDefault()
+          form.handleSubmit(() => {
+            formAction(new FormData(formRef.current!))
+          })(evt)
+        }}
+        className="grid gap-4"
+      >
         <div className="grid gap-2">
           <FormField
             control={form.control}
@@ -79,15 +88,47 @@ export const LoginForm: React.FC = () => {
         >
           ¿Olvidaste tu contraseña?
         </Link>
-        <Button type="submit" className="w-full">
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isPending}
+          aria-disabled={isPending}
+        >
           Iniciar sesión
         </Button>
+        {state?.message !== '' && !state.issues && (
+          <div className="text-center text-sm text-red-500">
+            {state.message}
+          </div>
+        )}
+        {state?.issues && (
+          <div className="text-center text-sm text-red-500">
+            <ul>
+              {state.issues.map((issue) => (
+                <li key={issue} className="flex gap-1">
+                  <IconX color="red" />
+                  {issue}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <Separator />
-        <Button variant="outline" className="w-full flex gap-2.5">
+        <Button
+          variant="outline"
+          className="w-full flex gap-2.5"
+          disabled={isPending}
+          aria-disabled={isPending}
+        >
           <IconBrandGoogle size={25} />
           Iniciar con Google
         </Button>
-        <Button variant="outline" className="w-full flex gap-2.5">
+        <Button
+          variant="outline"
+          className="w-full flex gap-2.5"
+          disabled={isPending}
+          aria-disabled={isPending}
+        >
           <IconBrandInstagram size={25} />
           Iniciar con Instagram
         </Button>

@@ -38,21 +38,21 @@ export const usersRouter = router({
       ) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'firstName, lastName, email, and password are required'
+          message: 'Todos los campos son requeridos'
         })
       }
 
       if (input.password !== input.confirmPassword) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Passwords do not match'
+          message: 'Las contraseñas no coinciden'
         })
       }
 
       if (input.password.length < 8 || input.password.length > 16) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Password must be at least 8 characters and no more than 16'
+          message: 'La contraseña debe tener entre 8 y 16 caracteres'
         })
       }
 
@@ -71,7 +71,7 @@ export const usersRouter = router({
         if (existingUser.length > 0) {
           throw new TRPCError({
             code: 'INTERNAL_SERVER_ERROR',
-            message: 'User already exists'
+            message: 'Este usuario ya existe'
           })
         }
 
