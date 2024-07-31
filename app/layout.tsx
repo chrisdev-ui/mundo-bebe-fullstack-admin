@@ -22,7 +22,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  await initActions() // dirty hack to avoid await top-level issue in Next.js
+  await initActions() // dirty hack to avoid await top-level issue with server actions in Next.js
   return (
     <html lang="es">
       <body

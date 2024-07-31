@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { IconBrandGoogle, IconBrandInstagram, IconX } from '@tabler/icons-react'
 import Link from 'next/link'
 import { useRef } from 'react'
+import { useFormState } from 'react-dom'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -21,7 +22,6 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { Separator } from '@/components/ui/separator'
 import { authenticate } from '@/lib/actions'
 import { loginFormSchema as formSchema } from '@/types/schemas'
-import { useFormState } from 'react-dom'
 
 export const LoginForm: React.FC = () => {
   const [state, formAction, isPending] = useFormState(authenticate, {
