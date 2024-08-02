@@ -30,12 +30,7 @@ export const usersRouter = router({
           cause: parsedInput.error.issues.map((err) => err.message).join(', ')
         })
       }
-      if (
-        !input.firstName ||
-        !input.lastName ||
-        !input.email ||
-        !input.password
-      ) {
+      if (!input.name || !input.lastName || !input.email || !input.password) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Todos los campos son requeridos'
@@ -76,7 +71,7 @@ export const usersRouter = router({
         }
 
         await db.insert(users).values({
-          firstName: input.firstName,
+          name: input.name,
           lastName: input.lastName,
           username: input.email,
           password: hash,

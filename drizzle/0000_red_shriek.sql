@@ -34,14 +34,14 @@ CREATE TABLE IF NOT EXISTS "session" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"first_name" text,
+	"name" text,
 	"last_name" text,
 	"username" text NOT NULL,
 	"password" text NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" timestamp,
 	"role" text DEFAULT 'USER' NOT NULL,
-	"avatar" text,
+	"image" text,
 	"phone_number" text,
 	"dob" timestamp,
 	"created_at" timestamp DEFAULT now() NOT NULL,

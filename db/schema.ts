@@ -11,14 +11,14 @@ import type { AdapterAccountType } from 'next-auth/adapters'
 
 export const users = pgTable('user', {
   id: uuid('id').primaryKey().defaultRandom().notNull(),
-  firstName: text('first_name'),
+  name: text('name'),
   lastName: text('last_name'),
   username: text('username').notNull(),
   password: text('password').notNull(),
   email: text('email').unique().notNull(),
   emailVerified: timestamp('email_verified', { mode: 'date' }),
   role: text('role').$type<'USER' | 'ADMIN'>().notNull().default('USER'),
-  avatar: text('avatar'),
+  image: text('image'),
   phoneNumber: text('phone_number'),
   dob: timestamp('dob', { mode: 'date' }),
   createdAt: timestamp('created_at').notNull().defaultNow(),

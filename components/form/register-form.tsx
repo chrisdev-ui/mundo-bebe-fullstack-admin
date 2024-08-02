@@ -25,7 +25,7 @@ import { useRouter } from 'next/navigation'
 
 const formSchema = z
   .object({
-    firstName: z.string().min(1, { message: 'El nombre es requerido' }).max(50),
+    name: z.string().min(1, { message: 'El nombre es requerido' }).max(50),
     lastName: z
       .string()
       .min(1, { message: 'El apellido es requerido' })
@@ -76,7 +76,7 @@ export const RegisterForm: React.FC = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: 'Christian Gabriel',
+      name: 'Christian Gabriel',
       lastName: 'Torres Martinez',
       email: 'web.christian.dev@gmail.com',
       password: 'KtmN$Pqx1',
@@ -95,7 +95,7 @@ export const RegisterForm: React.FC = () => {
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="firstName"
+            name="name"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nombres</FormLabel>
