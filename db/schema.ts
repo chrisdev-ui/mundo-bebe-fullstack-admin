@@ -1,29 +1,45 @@
+import { sql, SQL } from 'drizzle-orm'
 import {
+  AnyPgColumn,
   boolean,
   integer,
   pgTable,
   primaryKey,
   text,
   timestamp,
+  uniqueIndex,
   uuid
 } from 'drizzle-orm/pg-core'
 import type { AdapterAccountType } from 'next-auth/adapters'
 
-export const users = pgTable('user', {
-  id: uuid('id').primaryKey().defaultRandom().notNull(),
-  name: text('name'),
-  lastName: text('last_name'),
-  username: text('username').notNull(),
-  password: text('password').notNull(),
-  email: text('email').unique().notNull(),
-  emailVerified: timestamp('email_verified', { mode: 'date' }),
-  role: text('role').$type<'USER' | 'ADMIN'>().notNull().default('USER'),
-  image: text('image'),
-  phoneNumber: text('phone_number'),
-  dob: timestamp('dob', { mode: 'date' }),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow()
-})
+export function lower(email: AnyPgColumn): SQL {
+  return sql`lower(${email})`
+}
+
+export const users = pgTable(
+  'user',
+  {
+    id: uuid('id').primaryKey().defaultRandom().notNull(),
+    name: text('name'),
+    lastName: text('last_name'),
+    username: text('username').notNull(),
+    password: text('password').notNull(),
+    email: text('email').unique().notNull(),
+    emailVerified: timestamp('email_verified', { mode: 'date' }),
+    role: text('role')
+      .$type<'USER' | 'ADMIN' | 'SUPER_ADMIN'>()
+      .notNull()
+      .default('USER'),
+    image: text('image'),
+    phoneNumber: text('phone_number'),
+    dob: timestamp('dob', { mode: 'date' }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow()
+  },
+  (table) => ({
+    emailUniqueIndex: uniqueIndex('email_unique_index').on(lower(table.email))
+  })
+)
 
 export const accounts = pgTable(
   'account',

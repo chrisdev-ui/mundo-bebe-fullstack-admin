@@ -2,7 +2,6 @@ import { TRPCError } from '@trpc/server'
 import { genSaltSync, hashSync } from 'bcrypt-ts'
 import { eq } from 'drizzle-orm'
 
-import { ADMIN_EMAILS } from '@/constants'
 import db from '@/db/drizzle'
 import { users } from '@/db/schema'
 import { userCreateSchema } from '@/server/schemas'
@@ -51,6 +50,13 @@ export const usersRouter = router({
         })
       }
 
+      if (input.role !== 'USER' && input.role !== 'ADMIN') {
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'El rol debe ser USER o ADMIN'
+        })
+      }
+
       try {
         const salt = genSaltSync(10)
         const hash = hashSync(input.password, salt)
@@ -77,7 +83,10 @@ export const usersRouter = router({
           password: hash,
           email: input.email,
           emailVerified: new Date(),
-          role: ADMIN_EMAILS.includes(input.email) ? 'ADMIN' : input.role
+          role:
+            process.env.SUPER_ADMIN_EMAIL === input.email
+              ? 'SUPER_ADMIN'
+              : input.role
         })
       } catch (e) {
         console.error(e)

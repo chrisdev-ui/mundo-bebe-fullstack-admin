@@ -9,6 +9,9 @@ import { compare } from 'bcrypt-ts'
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
+  session: {
+    strategy: 'jwt'
+  },
   providers: [
     Credentials({
       credentials: {
