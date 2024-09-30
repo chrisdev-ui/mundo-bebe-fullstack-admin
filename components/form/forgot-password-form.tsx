@@ -1,36 +1,36 @@
-'use client'
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import Link from 'next/link'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  email: z.string().email({ message: 'Correo electrónico inválido' })
-})
+  email: z.string().email({ message: "Correo electrónico inválido" }),
+});
 
 export const ForgotPasswordForm: React.FC = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: ''
-    }
-  })
+      email: "",
+    },
+  });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values)
-  }
+    console.log(values);
+  };
 
   return (
     <Form {...form}>
@@ -58,12 +58,12 @@ export const ForgotPasswordForm: React.FC = () => {
           Recuperar contraseña
         </Button>
         <div className="mt-4 text-center text-sm">
-          ¿Recordaste tu contraseña?{' '}
+          ¿Recordaste tu contraseña?{" "}
           <Link href="/iniciar-sesion" className="underline">
             Iniciar sesión
           </Link>
         </div>
       </form>
     </Form>
-  )
-}
+  );
+};

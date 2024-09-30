@@ -1,14 +1,16 @@
-import 'dotenv/config'
-import { defineConfig } from 'drizzle-kit'
-import { getXataClient } from './db/xata'
+import "dotenv/config";
 
-const xata = getXataClient()
+import { defineConfig } from "drizzle-kit";
+
+import { getXataClient } from "./db/xata";
+
+const xata = getXataClient();
 
 export default defineConfig({
-  schema: './db/schema.ts',
-  out: './drizzle',
-  dialect: 'postgresql',
+  schema: "./db/schema.ts",
+  out: "./drizzle",
+  dialect: "postgresql",
   dbCredentials: {
-    url: xata.sql.connectionString
-  }
-})
+    url: xata.sql.connectionString,
+  },
+});

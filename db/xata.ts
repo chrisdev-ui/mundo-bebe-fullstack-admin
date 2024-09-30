@@ -1,34 +1,35 @@
-import type { BaseClientOptions, SchemaInference } from '@xata.io/client'
-import { buildClient } from '@xata.io/client'
-import 'dotenv/config'
+import type { BaseClientOptions, SchemaInference } from "@xata.io/client";
+import { buildClient } from "@xata.io/client";
 
-const tables = [] as const
+import "dotenv/config";
 
-export type SchemaTables = typeof tables
-export type InferredTypes = SchemaInference<SchemaTables>
+const tables = [] as const;
 
-export type DatabaseSchema = {}
+export type SchemaTables = typeof tables;
+export type InferredTypes = SchemaInference<SchemaTables>;
 
-const DatabaseClient = buildClient()
+export type DatabaseSchema = {};
+
+const DatabaseClient = buildClient();
 
 const defaultOptions = {
-  databaseURL: process.env.XATA_DATABASE_URL
-}
+  databaseURL: process.env.XATA_DATABASE_URL,
+};
 
 export class XataClient extends DatabaseClient<DatabaseSchema> {
   constructor(options?: BaseClientOptions) {
-    super({ ...defaultOptions, ...options }, tables)
+    super({ ...defaultOptions, ...options }, tables);
   }
 }
 
-let instance: XataClient | undefined = undefined
+let instance: XataClient | undefined = undefined;
 
 export const getXataClient = () => {
-  if (instance) return instance
+  if (instance) return instance;
 
   instance = new XataClient({
     apiKey: process.env.XATA_API_KEY!,
-    branch: process.env.XATA_BRANCH!
-  })
-  return instance
-}
+    branch: process.env.XATA_BRANCH!,
+  });
+  return instance;
+};

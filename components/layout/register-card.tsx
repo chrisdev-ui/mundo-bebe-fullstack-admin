@@ -1,11 +1,11 @@
-import { RegisterForm } from '@/components/form/register-form'
+import { RegisterForm } from "@/components/form/register-form";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
-} from '@/components/ui/card'
+  CardTitle,
+} from "@/components/ui/card";
 
 export const RegisterCard: React.FC = () => {
   return (
@@ -20,5 +20,5 @@ export const RegisterCard: React.FC = () => {
         <RegisterForm />
       </CardContent>
     </Card>
-  )
-}
+  );
+};

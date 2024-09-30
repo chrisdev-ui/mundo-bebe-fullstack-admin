@@ -1,11 +1,11 @@
-import { LoginForm } from '@/components/form/login-form'
+import { LoginForm } from "@/components/form/login-form";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
-} from '@/components/ui/card'
+  CardTitle,
+} from "@/components/ui/card";
 
 export const LoginCard: React.FC = () => {
   return (
@@ -20,5 +20,5 @@ export const LoginCard: React.FC = () => {
         <LoginForm />
       </CardContent>
     </Card>
-  )
-}
+  );
+};

@@ -1,23 +1,23 @@
-'use client'
+"use client";
 
-import { forwardRef, useState } from 'react'
+import { forwardRef, useState } from "react";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
-import { Button } from '@/components/ui/button'
-import { Input, InputProps } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
-import { IconEye, IconEyeOff } from '@tabler/icons-react'
+import { Button } from "@/components/ui/button";
+import { Input, InputProps } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...props }, ref) => {
-    const [showPassword, setShowPassword] = useState<boolean>(false)
+    const [showPassword, setShowPassword] = useState<boolean>(false);
     const disabled =
-      props.value === '' || props.value === undefined || props.disabled
+      props.value === "" || props.value === undefined || props.disabled;
 
     return (
       <div className="relative">
         <Input
-          type={showPassword ? 'text' : 'password'}
-          className={cn('hide-password-toggle pr-10', className)}
+          type={showPassword ? "text" : "password"}
+          className={cn("hide-password-toggle pr-10", className)}
           ref={ref}
           {...props}
         />
@@ -35,7 +35,7 @@ const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
             <IconEyeOff size={20} aria-hidden="true" />
           )}
           <span className="sr-only">
-            {showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            {showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
           </span>
         </Button>
         <style>{`
@@ -47,10 +47,10 @@ const PasswordInput = forwardRef<HTMLInputElement, InputProps>(
         }
         `}</style>
       </div>
-    )
-  }
-)
+    );
+  },
+);
 
-PasswordInput.displayName = 'PasswordInput'
+PasswordInput.displayName = "PasswordInput";
 
-export { PasswordInput }
+export { PasswordInput };

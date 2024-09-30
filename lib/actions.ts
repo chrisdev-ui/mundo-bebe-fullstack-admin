@@ -1,59 +1,60 @@
-'use server'
+"use server";
 
-import { signIn, signOut } from '@/auth'
-import { FormState } from '@/types'
-import { loginFormSchema as schema } from '@/types/schemas'
-import { AuthError } from 'next-auth'
+import { AuthError } from "next-auth";
+
+import { signIn, signOut } from "@/auth";
+import { FormState } from "@/types";
+import { loginFormSchema as schema } from "@/types/schemas";
 
 export async function initActions(): Promise<void> {}
 
 export async function authenticate(
   prevState: FormState,
-  data: FormData
+  data: FormData,
 ): Promise<FormState> {
-  const formData = Object.fromEntries(data)
-  const parsedFormData = schema.safeParse(formData)
+  const formData = Object.fromEntries(data);
+  const parsedFormData = schema.safeParse(formData);
   if (!parsedFormData.success) {
-    const fields: Record<string, string> = {}
+    const fields: Record<string, string> = {};
     for (const key of Object.keys(formData)) {
-      fields[key] = formData[key].toString()
+      fields[key] = formData[key].toString();
     }
     return {
-      message: 'Las credenciales son inválidas',
+      message: "Las credenciales son inválidas",
       fields,
-      issues: parsedFormData.error.issues.map((issue) => issue.message)
-    }
+      issues: parsedFormData.error.issues.map((issue) => issue.message),
+    };
   }
   try {
-    await signIn('credentials', {
-      redirectTo: '/',
-      ...parsedFormData.data
-    })
+    await signIn("credentials", {
+      redirectTo: "/",
+      ...parsedFormData.data,
+    });
 
     return {
-      message: ''
-    }
+      message: "",
+    };
   } catch (error) {
     if (error instanceof AuthError) {
       switch (error.type) {
-        case 'CredentialsSignin':
+        case "CredentialsSignin":
           return {
             message: error.message,
-            fields: parsedFormData.data
-          }
+            fields: parsedFormData.data,
+          };
         default:
           return {
-            message: 'Algo salió mal. Por favor, intenta de nuevo',
-            fields: parsedFormData.data
-          }
+            message: "Algo salió mal. Por favor, intenta de nuevo",
+            fields: parsedFormData.data,
+          };
       }
     }
-    throw error
+    throw error;
   }
 }
 
 export async function logout(): Promise<void> {
   await signOut({
-    redirectTo: '/'
-  })
+    redirectTo: "/",
+  });
 }

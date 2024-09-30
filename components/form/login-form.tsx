@@ -1,43 +1,47 @@
-'use client'
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandGoogle, IconBrandInstagram, IconX } from '@tabler/icons-react'
-import Link from 'next/link'
-import { useRef } from 'react'
-import { useFormState } from 'react-dom'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { useRef } from "react";
+import Link from "next/link";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  IconBrandGoogle,
+  IconBrandInstagram,
+  IconX,
+} from "@tabler/icons-react";
+import { useFormState } from "react-dom";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { PasswordInput } from '@/components/ui/password-input'
-import { Separator } from '@/components/ui/separator'
-import { authenticate } from '@/lib/actions'
-import { loginFormSchema as formSchema } from '@/types/schemas'
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Separator } from "@/components/ui/separator";
+import { authenticate } from "@/lib/actions";
+import { loginFormSchema as formSchema } from "@/types/schemas";
 
 export const LoginForm: React.FC = () => {
   const [state, formAction, isPending] = useFormState(authenticate, {
-    message: ''
-  })
+    message: "",
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: 'web.christian.dev@gmail.com',
-      password: 'KtmN$Pqx1',
-      ...(state?.fields ?? {})
-    }
-  })
+      username: "web.christian.dev@gmail.com",
+      password: "KtmN$Pqx1",
+      ...(state?.fields ?? {}),
+    },
+  });
 
-  const formRef = useRef<HTMLFormElement>(null)
+  const formRef = useRef<HTMLFormElement>(null);
 
   return (
     <Form {...form}>
@@ -45,10 +49,10 @@ export const LoginForm: React.FC = () => {
         ref={formRef}
         action={formAction}
         onSubmit={(evt) => {
-          evt.preventDefault()
+          evt.preventDefault();
           form.handleSubmit(() => {
-            formAction(new FormData(formRef.current!))
-          })(evt)
+            formAction(new FormData(formRef.current!));
+          })(evt);
         }}
         className="grid gap-4"
       >
@@ -84,7 +88,7 @@ export const LoginForm: React.FC = () => {
         </div>
         <Link
           href="/recuperar-contrasena"
-          className="text-sm text-right underline"
+          className="text-right text-sm underline"
         >
           ¿Olvidaste tu contraseña?
         </Link>
@@ -96,7 +100,7 @@ export const LoginForm: React.FC = () => {
         >
           Iniciar sesión
         </Button>
-        {state?.message !== '' && !state.issues && (
+        {state?.message !== "" && !state.issues && (
           <div className="text-center text-sm text-red-500">
             {state.message}
           </div>
@@ -116,7 +120,7 @@ export const LoginForm: React.FC = () => {
         <Separator />
         <Button
           variant="outline"
-          className="w-full flex gap-2.5"
+          className="flex w-full gap-2.5"
           disabled={isPending}
           aria-disabled={isPending}
         >
@@ -125,7 +129,7 @@ export const LoginForm: React.FC = () => {
         </Button>
         <Button
           variant="outline"
-          className="w-full flex gap-2.5"
+          className="flex w-full gap-2.5"
           disabled={isPending}
           aria-disabled={isPending}
         >
@@ -133,12 +137,12 @@ export const LoginForm: React.FC = () => {
           Iniciar con Instagram
         </Button>
         <div className="mt-4 text-center text-sm">
-          ¿No tienes una cuenta?{' '}
+          ¿No tienes una cuenta?{" "}
           <Link href="/registrarse" className="underline">
             Registrarse
           </Link>
         </div>
       </form>
     </Form>
-  )
-}
+  );
+};

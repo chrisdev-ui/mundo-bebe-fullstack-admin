@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 export const userCreateSchema = z.object({
   name: z.string(),
@@ -6,5 +6,5 @@ export const userCreateSchema = z.object({
   email: z.string().email(),
   password: z.string(),
   confirmPassword: z.string(),
-  role: z.enum(['USER', 'ADMIN'])
-})
+  role: z.enum(["USER", "ADMIN"]),
+});

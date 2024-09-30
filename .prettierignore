@@ -1,0 +1,24 @@
+# Ignore everything.
+/*
+
+# Format most files in the root directory.
+!/*.js
+!/*.ts
+!/*.md
+!/*.json
+# But ignore some.
+/.xata
+/package.json
+/package-lock.json
+
+# Don't ignore these nested directories.
+!/app
+!/components
+!/lib
+!/drizzle
+!/constants
+!/db
+!/types
+!/server
+!/providers
+!/auth

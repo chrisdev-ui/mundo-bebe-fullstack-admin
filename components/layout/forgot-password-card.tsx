@@ -1,11 +1,11 @@
-import { ForgotPasswordForm } from '@/components/form/forgot-password-form'
+import { ForgotPasswordForm } from "@/components/form/forgot-password-form";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
-} from '@/components/ui/card'
+  CardTitle,
+} from "@/components/ui/card";
 
 export const ForgotPasswordCard: React.FC = () => {
   return (
@@ -21,5 +21,5 @@ export const ForgotPasswordCard: React.FC = () => {
         <ForgotPasswordForm />
       </CardContent>
     </Card>
-  )
-}
+  );
+};
