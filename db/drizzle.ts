@@ -5,13 +5,24 @@ import { Client } from "pg";
 
 import * as schema from "./schema";
 
-const client = new Client({ connectionString: process.env.XATA_POSTGRES_URL! });
-try {
-  await client.connect();
-  console.log("Connected to database successfully");
-} catch (error: any) {
-  console.error("Failed to connect to database", error.message);
-  process.exit(1);
+declare global {
+  var _pgClient: Client | undefined;
+}
+
+let client: Client;
+
+if (process.env.NODE_ENV === "development" && globalThis._pgClient) {
+  client = globalThis._pgClient;
+} else {
+  client = new Client({ connectionString: process.env.XATA_POSTGRES_URL! });
+  globalThis._pgClient = client;
+  try {
+    await client.connect();
+    console.log("Connected to database successfully");
+  } catch (error: any) {
+    console.error("Failed to connect to database", error.message);
+    process.exit(1);
+  }
 }
 
 const db = drizzle(client, {

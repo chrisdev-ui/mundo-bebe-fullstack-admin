@@ -3,11 +3,13 @@ import { compare } from "bcrypt-ts";
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 
+import { authConfig } from "@/auth.config";
 import db from "@/db/drizzle";
 import { getUserByEmailOrUsername } from "@/server/lib/users";
 import { loginSchema } from "@/server/schemas";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   adapter: DrizzleAdapter(db),
   session: {
     strategy: "jwt",
