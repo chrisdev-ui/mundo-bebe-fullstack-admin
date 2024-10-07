@@ -5,7 +5,7 @@ import Credentials from "next-auth/providers/credentials";
 
 import { authConfig } from "@/auth.config";
 import db from "@/db/drizzle";
-import { getUserByEmailOrUsername } from "@/server/lib/users";
+import { getUserByEmailOrUsername, getUserById } from "@/server/lib/users";
 import { loginSchema } from "@/server/schemas";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -13,6 +13,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db),
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60,
+    updateAge: 24 * 60 * 60,
+  },
+  callbacks: {
+    async session({ session, token }) {
+      session.user.id = token?.sub as string;
+      session.user.role = token?.user?.role;
+
+      return session;
+    },
+    async jwt({ token }) {
+      const userInfo = await getUserById(token?.sub as string);
+      return {
+        ...token,
+        user: {
+          ...(token.user ?? {}),
+          ...userInfo,
+        },
+      };
+    },
   },
   providers: [
     Credentials({

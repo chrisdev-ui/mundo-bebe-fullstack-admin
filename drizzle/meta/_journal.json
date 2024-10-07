@@ -15,6 +15,13 @@
       "when": 1727669841072,
       "tag": "0001_wandering_jamie_braddock",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1728279043837,
+      "tag": "0002_nasty_terror",
+      "breakpoints": true
     }
   ]
 }

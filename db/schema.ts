@@ -25,7 +25,7 @@ export const users = pgTable(
     username: text("username").notNull(),
     password: text("password").notNull(),
     email: text("email").unique().notNull(),
-    emailVerified: timestamp("email_verified", { mode: "date" }),
+    emailVerified: timestamp("emailVerified", { mode: "date" }),
     role: text("role")
       .$type<"USER" | "ADMIN" | "SUPER_ADMIN">()
       .notNull()

@@ -18,3 +18,16 @@ export async function getUserByEmailOrUsername(
     throw error;
   }
 }
+
+export async function getUserById(id: string): Promise<User | undefined> {
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, id),
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error getting user by id", error);
+    throw error;
+  }
+}
