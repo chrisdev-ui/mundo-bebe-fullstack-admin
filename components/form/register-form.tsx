@@ -58,7 +58,7 @@ export const RegisterForm: React.FC = () => {
   const router = useRouter();
   const { toast } = useToast();
 
-  const createUser = trpc.users.create.useMutation({
+  const { mutate: createUser, isPending } = trpc.users.create.useMutation({
     onSuccess: () => {
       toast({
         description: "Cuenta creada exitosamente",
@@ -86,7 +86,7 @@ export const RegisterForm: React.FC = () => {
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    createUser.mutate(values);
+    createUser(values);
   };
 
   return (
@@ -169,15 +169,31 @@ export const RegisterForm: React.FC = () => {
             )}
           />
         </div>
-        <Button type="submit" className="w-full">
+        <Button
+          size="xl"
+          type="submit"
+          className="w-full"
+          disabled={isPending}
+          aria-disabled={isPending}
+        >
           Crear una cuenta
         </Button>
         <Separator />
-        <Button variant="outline" className="flex w-full gap-2.5">
+        <Button
+          variant="outline"
+          className="flex w-full gap-2.5"
+          disabled={isPending}
+          aria-disabled={isPending}
+        >
           <IconBrandGoogle size={25} />
           Registrarse con Google
         </Button>
-        <Button variant="outline" className="flex w-full gap-2.5">
+        <Button
+          variant="outline"
+          className="flex w-full gap-2.5"
+          disabled={isPending}
+          aria-disabled={isPending}
+        >
           <IconBrandInstagram size={25} />
           Registrarse con Instagram
         </Button>

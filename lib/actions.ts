@@ -53,6 +53,18 @@ export async function authenticate(
   }
 }
 
+export async function loginWithGoogle(): Promise<void> {
+  await signIn("google", {
+    redirectTo: "/",
+  });
+}
+
+export async function loginWithInstagram(): Promise<void> {
+  await signIn("instagram", {
+    redirectTo: "/",
+  });
+}
+
 export async function logout(): Promise<void> {
   await signOut({
     redirectTo: "/",

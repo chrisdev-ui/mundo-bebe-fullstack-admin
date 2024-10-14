@@ -11,8 +11,10 @@ export const RegisterCard: React.FC = () => {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-xl">Registrarse</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-center text-[50px] font-extrabold leading-[1.18em]">
+          Registrarse
+        </CardTitle>
+        <CardDescription className="text-center">
           Introduce tu información para crear una cuenta
         </CardDescription>
       </CardHeader>

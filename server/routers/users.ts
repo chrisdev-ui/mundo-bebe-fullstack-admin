@@ -67,8 +67,6 @@ export const usersRouter = router({
           .where(eq(users.email, input.email))
           .execute();
 
-        console.log(existingUser);
-
         if (existingUser.length > 0) {
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",

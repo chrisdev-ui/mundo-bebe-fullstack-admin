@@ -11,10 +11,10 @@ export const LoginCard: React.FC = () => {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-[50px] font-extrabold leading-[1.18em]">
+        <CardTitle className="text-center text-[50px] font-extrabold leading-[1.18em]">
           Iniciar sesión
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-center">
           Introduce tu información para acceder a tu cuenta
         </CardDescription>
       </CardHeader>

@@ -1,8 +1,10 @@
 import { z } from "zod";
 
-import { userSelect } from "@/server/schemas";
+import { authUserSelect, userSelect } from "@/server/schemas";
 
 export type User = z.infer<typeof userSelect>;
+
+export type AuthUser = z.infer<typeof authUserSelect>;
 
 export type FormState = {
   message: string;

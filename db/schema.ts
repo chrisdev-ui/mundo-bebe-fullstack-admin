@@ -22,9 +22,9 @@ export const users = pgTable(
     id: uuid("id").primaryKey().defaultRandom().notNull(),
     name: text("name"),
     lastName: text("last_name"),
-    username: text("username").notNull(),
-    password: text("password").notNull(),
-    email: text("email").unique().notNull(),
+    username: text("username"),
+    password: text("password"),
+    email: text("email").unique(),
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     role: text("role")
       .$type<"USER" | "ADMIN" | "SUPER_ADMIN">()

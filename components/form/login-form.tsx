@@ -3,11 +3,7 @@
 import { useRef } from "react";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  IconBrandGoogle,
-  IconBrandInstagram,
-  IconX,
-} from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -26,6 +22,10 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { authenticate } from "@/lib/actions";
 import { loginFormSchema as formSchema } from "@/types/schemas";
+import {
+  GoogleSignInButton,
+  InstagramSignInButton,
+} from "../auth/auth-buttons";
 
 export const LoginForm: React.FC = () => {
   const [state, formAction, isPending] = useFormState(authenticate, {
@@ -93,6 +93,7 @@ export const LoginForm: React.FC = () => {
           ¿Olvidaste tu contraseña?
         </Link>
         <Button
+          size="xl"
           type="submit"
           className="w-full"
           disabled={isPending}
@@ -118,24 +119,8 @@ export const LoginForm: React.FC = () => {
           </div>
         )}
         <Separator />
-        <Button
-          variant="outline"
-          className="flex w-full gap-2.5"
-          disabled={isPending}
-          aria-disabled={isPending}
-        >
-          <IconBrandGoogle size={25} />
-          Iniciar con Google
-        </Button>
-        <Button
-          variant="outline"
-          className="flex w-full gap-2.5"
-          disabled={isPending}
-          aria-disabled={isPending}
-        >
-          <IconBrandInstagram size={25} />
-          Iniciar con Instagram
-        </Button>
+        <GoogleSignInButton isPending={isPending} />
+        <InstagramSignInButton isPending={isPending} />
         <div className="mt-4 text-center text-sm">
           ¿No tienes una cuenta?{" "}
           <Link href="/registrarse" className="underline">

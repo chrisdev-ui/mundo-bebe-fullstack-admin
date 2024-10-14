@@ -2,6 +2,8 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { compare } from "bcrypt-ts";
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
+import Instagram from "next-auth/providers/instagram";
 
 import { authConfig } from "@/auth.config";
 import db from "@/db/drizzle";
@@ -18,20 +20,47 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   callbacks: {
     async session({ session, token }) {
-      session.user.id = token?.sub as string;
-      session.user.role = token?.user?.role;
+      if (token.user) {
+        session.user = {
+          ...session.user,
+          ...token.user,
+          email: token.user.email as string,
+        };
+      }
 
       return session;
     },
-    async jwt({ token }) {
-      const userInfo = await getUserById(token?.sub as string);
-      return {
-        ...token,
-        user: {
-          ...(token.user ?? {}),
-          ...userInfo,
-        },
-      };
+    async jwt({ token, user }) {
+      if (user) {
+        const userInfo = await getUserById(user.id as string);
+        if (!userInfo) {
+          throw new Error("No se pudo recuperar el usuario");
+        }
+        const { password: _, ...userInfoWithoutPassword } = userInfo;
+        token = {
+          ...token,
+          user: {
+            ...userInfoWithoutPassword,
+          },
+        };
+      }
+
+      if (token.sub) {
+        const userInfo = await getUserById(token.sub);
+        if (!userInfo) {
+          throw new Error("No se pudo recuperar el usuario");
+        }
+        const { password: _, ...userInfoWithoutPassword } = userInfo;
+        token = {
+          ...token,
+          user: {
+            ...token.user,
+            ...userInfoWithoutPassword,
+          },
+        };
+      }
+
+      return token;
     },
   },
   providers: [
@@ -54,7 +83,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           throw new CredentialsSignin("Usuario no encontrado");
         }
 
-        const isMatched = await compare(password, user.password);
+        const isMatched = await compare(password, user.password as string);
 
         if (!isMatched) {
           throw new CredentialsSignin("Contraseña incorrecta");
@@ -65,5 +94,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         return userData;
       },
     }),
+    Google,
+    Instagram,
   ],
 });

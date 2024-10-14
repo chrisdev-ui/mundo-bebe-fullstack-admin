@@ -9,3 +9,6 @@ export const loginSchema = z.object({
 });
 
 export const userSelect = createSelectSchema(users);
+export const authUserSelect = createSelectSchema(users).omit({
+  password: true,
+});
