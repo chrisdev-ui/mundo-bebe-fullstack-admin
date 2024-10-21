@@ -1,7 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconBrandGoogle, IconBrandInstagram } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
@@ -56,11 +57,27 @@ const formSchema = z
 
 export const RegisterForm: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
+
+  const code = searchParams.get("code");
+  const email = searchParams.get("email");
+
+  const { data: isValidCode, isFetching } =
+    trpc.invitations.checkValidCode.useQuery(
+      {
+        code: code as string,
+        email: email as string,
+      },
+      {
+        enabled: !!code && !!email,
+      },
+    );
 
   const { mutate: createUser, isPending } = trpc.users.create.useMutation({
     onSuccess: () => {
       toast({
+        variant: "success",
         description: "Cuenta creada exitosamente",
       });
       router.push("/iniciar-sesion");
@@ -76,18 +93,37 @@ export const RegisterForm: React.FC = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "Christian Gabriel",
-      lastName: "Torres Martinez",
-      email: "web.christian.dev@gmail.com",
-      password: "KtmN$Pqx1",
-      confirmPassword: "KtmN$Pqx1",
+      name: "",
+      lastName: "",
+      email: email ?? "",
+      password: "",
+      confirmPassword: "",
       role: "USER",
     },
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    createUser(values);
+    if (email != null && values.email !== email) {
+      toast({
+        description:
+          "El correo electrónico no coincide con el código de invitación",
+        variant: "destructive",
+      });
+      return;
+    }
+    createUser({ ...values, role: isValidCode ? "ADMIN" : "USER" });
   };
+
+  const isLoading = isPending || isFetching;
+
+  useEffect(() => {
+    if (isValidCode !== undefined && !isValidCode) {
+      toast({
+        description: "Código de invitación no válido",
+        variant: "destructive",
+      });
+    }
+  }, [isValidCode, toast]);
 
   return (
     <Form {...form}>
@@ -100,7 +136,7 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Nombres</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Carlos Antonio" {...field} />
+                  <Input disabled={isLoading} type="text" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -113,7 +149,7 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Apellidos</FormLabel>
                 <FormControl>
-                  <Input type="text" placeholder="Perez Perez" {...field} />
+                  <Input type="text" disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -128,11 +164,7 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Correo electrónico</FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="carlos@example.com"
-                    {...field}
-                  />
+                  <Input type="email" disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -147,7 +179,7 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Contraseña</FormLabel>
                 <FormControl>
-                  <PasswordInput {...field} />
+                  <PasswordInput disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -162,7 +194,7 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Confirmar contraseña</FormLabel>
                 <FormControl>
-                  <PasswordInput {...field} />
+                  <PasswordInput disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -173,8 +205,8 @@ export const RegisterForm: React.FC = () => {
           size="xl"
           type="submit"
           className="w-full"
-          disabled={isPending}
-          aria-disabled={isPending}
+          disabled={isLoading}
+          aria-disabled={isLoading}
         >
           Crear una cuenta
         </Button>
@@ -182,8 +214,8 @@ export const RegisterForm: React.FC = () => {
         <Button
           variant="outline"
           className="flex w-full gap-2.5"
-          disabled={isPending}
-          aria-disabled={isPending}
+          disabled={isLoading}
+          aria-disabled={isLoading}
         >
           <IconBrandGoogle size={25} />
           Registrarse con Google
@@ -191,8 +223,8 @@ export const RegisterForm: React.FC = () => {
         <Button
           variant="outline"
           className="flex w-full gap-2.5"
-          disabled={isPending}
-          aria-disabled={isPending}
+          disabled={isLoading}
+          aria-disabled={isLoading}
         >
           <IconBrandInstagram size={25} />
           Registrarse con Instagram

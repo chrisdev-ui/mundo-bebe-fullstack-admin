@@ -32,6 +32,11 @@ const toastVariants = cva(
         default: "border bg-background text-foreground",
         destructive:
           "destructive group border-destructive bg-destructive text-destructive-foreground",
+        info: "info group border-info bg-info text-info-foreground",
+        success:
+          "success group border-success bg-success text-success-foreground",
+        warning:
+          "warning group border-warning bg-warning text-warning-foreground",
       },
     },
     defaultVariants: {
@@ -62,7 +67,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.info]:border-muted/40 group-[.success]:border-muted/40 group-[.warning]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.info]:hover:border-info/30 group-[.success]:hover:border-success/30 group-[.warning]:hover:border-warning/30 group-[.destructive]:hover:bg-destructive group-[.info]:hover:bg-info group-[.success]:hover:bg-success group-[.warning]:hover:bg-warning group-[.destructive]:hover:text-destructive-foreground group-[.info]:hover:text-info-foreground group-[.success]:hover:text-success-foreground group-[.warning]:hover:text-warning-foreground group-[.destructive]:focus:ring-destructive group-[.info]:focus:ring-info group-[.success]:focus:ring-success group-[.warning]:focus:ring-warning",
       className,
     )}
     {...props}

@@ -107,3 +107,11 @@ export const authenticators = pgTable(
     }),
   }),
 );
+
+export const invites = pgTable("invitation", {
+  id: uuid("id").primaryKey().defaultRandom().notNull(),
+  email: text("email").notNull(),
+  token: text("token").unique().notNull(),
+  expiresAt: timestamp("expires", { mode: "date" }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});

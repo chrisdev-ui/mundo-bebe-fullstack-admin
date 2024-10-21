@@ -1,9 +1,10 @@
-import { ForgotPasswordCard } from "@/components/layout/forgot-password-card";
+import { AuthContainer } from "@/components/layout/auth-container.server";
+import { ForgotPasswordCard } from "@/components/layout/forgot-password-card.server";
 
 export default function ForgotPasswordPage() {
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center">
+    <AuthContainer>
       <ForgotPasswordCard />
-    </main>
+    </AuthContainer>
   );
 }

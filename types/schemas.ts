@@ -11,3 +11,8 @@ export const loginFormSchema = z.object({
     .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
     .max(16, { message: "La contraseña no puede tener más de 16 caracteres" }),
 });
+
+export const inviteAdminSchema = z.object({
+  name: z.string().min(1, { message: "El nombre es requerido" }),
+  email: z.string().email({ message: "Correo electrónico inválido" }),
+});

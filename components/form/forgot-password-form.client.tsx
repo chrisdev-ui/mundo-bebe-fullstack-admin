@@ -15,12 +15,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { trpc } from "@/server/client";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Correo electrónico inválido" }),
 });
 
 export const ForgotPasswordForm: React.FC = () => {
+  const { toast } = useToast();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,8 +32,27 @@ export const ForgotPasswordForm: React.FC = () => {
     },
   });
 
+  const { mutate: forgotPasswordSubmit, isPending } =
+    trpc.users.forgotPassword.useMutation({
+      onSuccess: () => {
+        toast({
+          description:
+            "Se ha enviado un correo con las instrucciones para recuperar tu contraseña",
+          variant: "success",
+        });
+        form.reset();
+      },
+      onError: (error) => {
+        toast({
+          variant: "destructive",
+          description: error.message,
+        });
+        form.reset();
+      },
+    });
+
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+    forgotPasswordSubmit(values);
   };
 
   return (
@@ -45,7 +68,8 @@ export const ForgotPasswordForm: React.FC = () => {
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="carlos@example.com"
+                    placeholder="Tu correo electrónico"
+                    disabled={isPending}
                     {...field}
                   />
                 </FormControl>
@@ -54,7 +78,7 @@ export const ForgotPasswordForm: React.FC = () => {
             )}
           />
         </div>
-        <Button type="submit" className="w-full">
+        <Button type="submit" disabled={isPending} className="w-full">
           Recuperar contraseña
         </Button>
         <div className="mt-4 text-center text-sm">

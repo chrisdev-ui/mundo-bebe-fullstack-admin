@@ -4,7 +4,7 @@ import { AuthError } from "next-auth";
 
 import { signIn, signOut } from "@/auth";
 import { FormState } from "@/types";
-import { loginFormSchema as schema } from "@/types/schemas";
+import { loginFormSchema } from "@/types/schemas";
 
 export async function initActions(): Promise<void> {}
 
@@ -13,7 +13,7 @@ export async function authenticate(
   data: FormData,
 ): Promise<FormState> {
   const formData = Object.fromEntries(data);
-  const parsedFormData = schema.safeParse(formData);
+  const parsedFormData = loginFormSchema.safeParse(formData);
   if (!parsedFormData.success) {
     const fields: Record<string, string> = {};
     for (const key of Object.keys(formData)) {
