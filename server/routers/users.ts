@@ -1,8 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { genSaltSync, hashSync } from "bcrypt-ts";
+import { differenceInMinutes, parseISO } from "date-fns";
 import { and, eq, SQL } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
+import { PASSWORD_CHANGE_COOLDOWN_MINUTES } from "@/constants";
 import { users } from "@/db/schema";
 import { sendEmail } from "@/lib/sendgrid";
 import {
@@ -60,7 +62,10 @@ export const usersRouter = router({
           });
         }
         return existUser;
-      } catch (error) {
+      } catch (error: any) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
         console.error(error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -139,7 +144,10 @@ export const usersRouter = router({
               ? "SUPER_ADMIN"
               : input.role,
         });
-      } catch (e) {
+      } catch (e: any) {
+        if (e instanceof TRPCError) {
+          throw e;
+        }
         console.error(e);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -179,27 +187,44 @@ export const usersRouter = router({
           });
         }
 
+        const minutesSinceLastUpdate = differenceInMinutes(
+          new Date(),
+          parseISO(user.updatedAt.toISOString()),
+        );
+
+        if (minutesSinceLastUpdate < PASSWORD_CHANGE_COOLDOWN_MINUTES) {
+          const waitMinutes =
+            PASSWORD_CHANGE_COOLDOWN_MINUTES - minutesSinceLastUpdate;
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: `La contraseña no puede ser cambiada. Por favor espera ${waitMinutes} minutos antes de intentar nuevamente.`,
+          });
+        }
+
         const token = jwt.sign(
           { userId: user.id, email: user.email },
           JWT_SECRET,
           { expiresIn: RESET_TOKEN_EXPIRY },
         );
 
+        const webUrl = `${process.env.NEXT_PUBLIC_APP_URL}/resetear-contrasena?token=${token}&email=${input.email}`;
+
         await sendEmail({
           data: {
             templateName: "reset_password",
             to: input.email,
             name: user.name as string,
-            email: input.email,
-            token,
-            webUrl: process.env.NEXT_PUBLIC_APP_URL as string,
+            webUrl,
           },
         });
-      } catch (error) {
+      } catch (error: any) {
+        if (error instanceof TRPCError) {
+          throw error;
+        }
         console.error(error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al enviar el correo",
+          message: "Ha ocurrido un error al intentar recuperar la contraseña",
         });
       }
     }),
@@ -233,24 +258,41 @@ export const usersRouter = router({
           });
         }
 
+        const minutesSinceLastUpdate = differenceInMinutes(
+          new Date(),
+          parseISO(user.updatedAt.toISOString()),
+        );
+
+        if (minutesSinceLastUpdate < PASSWORD_CHANGE_COOLDOWN_MINUTES) {
+          const waitMinutes =
+            PASSWORD_CHANGE_COOLDOWN_MINUTES - minutesSinceLastUpdate;
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: `La contraseña no puede ser cambiada. Por favor espera ${waitMinutes} minutos antes de intentar nuevamente.`,
+          });
+        }
+
         const salt = genSaltSync(10);
         const hash = hashSync(input.newPassword, salt);
 
         await ctx.db
           .update(users)
-          .set({ password: hash })
+          .set({ password: hash, updatedAt: new Date() })
           .where(eq(users.id, decoded.userId));
-      } catch (error) {
+      } catch (error: any) {
         if (error instanceof jwt.JsonWebTokenError) {
           throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "El token no es válido o ha caducado",
           });
         }
+        if (error instanceof TRPCError) {
+          throw error;
+        }
         console.error(error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al cambiar la contraseña",
+          message: "Ha ocurrido un error al intentar cambiar la contraseña",
         });
       }
     }),

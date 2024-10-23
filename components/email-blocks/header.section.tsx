@@ -1,6 +1,11 @@
 import { Column, Img, Row, Section } from "@react-email/components";
 
-type Section = "logo" | "sectionsBorders" | "sectionBorder" | "sectionCenter";
+type Section =
+  | "logo"
+  | "image"
+  | "sectionsBorders"
+  | "sectionBorder"
+  | "sectionCenter";
 
 export const Header = () => {
   return (
@@ -11,6 +16,7 @@ export const Header = () => {
           width="170"
           height="50"
           alt="Logo Mundo Bebé"
+          style={styles.image}
         />
       </Section>
       <Section style={styles.sectionsBorders}>
@@ -26,10 +32,11 @@ export const Header = () => {
 
 const styles: Record<Section, React.CSSProperties> = {
   logo: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
     padding: "30px",
+    width: "100%",
+  },
+  image: {
+    margin: "0 auto",
   },
   sectionsBorders: {
     width: "100%",

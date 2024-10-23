@@ -73,15 +73,15 @@ export const invitationsRouter = router({
           expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         });
 
+        const url = `${process.env.NEXT_PUBLIC_APP_URL}/registrarse?code=${token}&email=${input.email}`;
+
         await sendEmail({
           data: {
             templateName: "welcome",
             to: input.email,
-            emailAddress: input.email,
             name: input.name,
             role: "ADMIN",
-            code: token,
-            webUrl: process.env.NEXT_PUBLIC_APP_URL as string,
+            webUrl: url,
           },
         });
       } catch (e) {

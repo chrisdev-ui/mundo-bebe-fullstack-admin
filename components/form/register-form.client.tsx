@@ -93,11 +93,11 @@ export const RegisterForm: React.FC = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      lastName: "",
-      email: email ?? "",
-      password: "",
-      confirmPassword: "",
+      name: "Christian Gabriel",
+      lastName: "Torres Martinez",
+      email: email ?? "web.christian.dev@gmail.com",
+      password: "KtmN$Pqx1",
+      confirmPassword: "KtmN$Pqx1",
       role: "USER",
     },
   });

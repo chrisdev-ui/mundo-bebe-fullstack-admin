@@ -39,12 +39,12 @@ export async function authenticate(
       switch (error.type) {
         case "CredentialsSignin":
           return {
-            message: error.message,
+            message: `${error.message.split(".")[0]}.`,
             fields: parsedFormData.data,
           };
         default:
           return {
-            message: "Algo salió mal. Por favor, intenta de nuevo",
+            message: error.message,
             fields: parsedFormData.data,
           };
       }
@@ -67,6 +67,6 @@ export async function loginWithInstagram(): Promise<void> {
 
 export async function logout(): Promise<void> {
   await signOut({
-    redirectTo: "/",
+    redirectTo: "/iniciar-sesion",
   });
 }

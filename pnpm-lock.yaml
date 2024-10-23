@@ -7,6 +7,7 @@ overrides:
 specifiers:
   '@auth/core': ^0.35.3
   '@auth/drizzle-adapter': ^1.5.3
+  '@date-fns/tz': ^1.1.2
   '@hookform/resolvers': ^3.9.0
   '@ianvs/prettier-plugin-sort-imports': ^4.3.1
   '@radix-ui/react-label': ^2.1.0
@@ -31,6 +32,7 @@ specifiers:
   bcrypt-ts: ^5.0.2
   class-variance-authority: ^0.7.0
   clsx: ^2.1.1
+  date-fns: ^4.1.0
   dotenv: ^16.4.5
   drizzle-kit: ^0.23.2
   drizzle-orm: ^0.32.2
@@ -51,7 +53,7 @@ specifiers:
   react-hook-form: ^7.53.0
   tailwind-merge: ^2.5.2
   tailwindcss: ^3.4.13
-  tailwindcss-animate: ^1.0.7
+  tailwindcss-animated: ^1.1.2
   trpc-openapi: ^1.2.0
   typescript: ^5.6.2
   zod: ^3.23.8
@@ -59,6 +61,7 @@ specifiers:
 dependencies:
   '@auth/core': 0.35.3
   '@auth/drizzle-adapter': 1.5.3
+  '@date-fns/tz': 1.1.2
   '@hookform/resolvers': 3.9.0_react-hook-form@7.53.0
   '@radix-ui/react-label': 2.1.0_mkiudn5np2u2zdlctjbeq6iuwa
   '@radix-ui/react-separator': 1.1.0_mkiudn5np2u2zdlctjbeq6iuwa
@@ -77,6 +80,7 @@ dependencies:
   bcrypt-ts: 5.0.2
   class-variance-authority: 0.7.0
   clsx: 2.1.1
+  date-fns: 4.1.0
   dotenv: 16.4.5
   drizzle-orm: 0.32.2_uoz7opflutaonsrnw7ysfnhawi
   drizzle-zod: 0.5.1_s5qxzobvzfhpitx7cdxouwblhe
@@ -90,7 +94,7 @@ dependencies:
   react-email: 3.0.1_nnrd3gsncyragczmpvfhocinkq
   react-hook-form: 7.53.0_react@18.3.1
   tailwind-merge: 2.5.2
-  tailwindcss-animate: 1.0.7_tailwindcss@3.4.13
+  tailwindcss-animated: 1.1.2_tailwindcss@3.4.13
   trpc-openapi: 1.2.0_mqq3lvhr3rexeesdb27hjcvlru
   zod: 3.23.8
 
@@ -375,6 +379,10 @@ packages:
       '@babel/helper-string-parser': 7.24.8
       '@babel/helper-validator-identifier': 7.24.7
       to-fast-properties: 2.0.0
+
+  /@date-fns/tz/1.1.2:
+    resolution: {integrity: sha512-Xmg2cPmOPQieCLAdf62KtFPU9y7wbQDq1OAzrs/bEQFvhtCPXDiks1CHDE/sTXReRfh/MICVkw/vY6OANHUGiA==}
+    dev: false
 
   /@drizzle-team/brocli/0.8.2:
     resolution: {integrity: sha512-zTrFENsqGvOkBOuHDC1pXCkDXNd2UhP4lI3gYGhQ1R1SPeAAfqzPsV1dcpMy4uNU6kB5VpU5NGhvwxVNETR02A==}
@@ -2662,6 +2670,10 @@ packages:
       es-errors: 1.3.0
       is-data-view: 1.0.1
     dev: true
+
+  /date-fns/4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
+    dev: false
 
   /debounce/2.0.0:
     resolution: {integrity: sha512-xRetU6gL1VJbs85Mc4FoEGSjQxzpdxRyFhe3lmWFyy2EzydIcD4xzUvRJMD+NPDfMwKNhxa3PvsIOU32luIWeA==}
@@ -5749,10 +5761,10 @@ packages:
     resolution: {integrity: sha512-kjEBm+pvD+6eAwzJL2Bi+02/9LFLal1Gs61+QB7HvTfQQ0aXwC5LGT8PEt1gS0CWKktKe6ysPTAy3cBC5MeiIg==}
     dev: false
 
-  /tailwindcss-animate/1.0.7_tailwindcss@3.4.13:
-    resolution: {integrity: sha512-bl6mpH3T7I3UFxuvDEXLxy/VuFxBk5bbzplh7tXI68mwMokNYd1t9qPBHlnyTwfa4JGC4zP516I1hYYtQ/vspA==}
+  /tailwindcss-animated/1.1.2_tailwindcss@3.4.13:
+    resolution: {integrity: sha512-SI4owS5ojserhgEYIZA/uFVdNjU2GMB2P3sjtjmFA52VxoUi+Hht6oR5+RdT+CxrX9cNNYEa+vbTWHvN9zbj3w==}
     peerDependencies:
-      tailwindcss: '>=3.0.0 || insiders'
+      tailwindcss: '>=3.1.0'
     dependencies:
       tailwindcss: 3.4.13
     dev: false

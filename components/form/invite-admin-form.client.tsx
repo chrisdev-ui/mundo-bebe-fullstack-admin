@@ -64,7 +64,7 @@ export const InviteAdminForm: React.FC = () => {
             <FormItem>
               <FormLabel>Correo electrónico</FormLabel>
               <FormControl>
-                <Input type="email" {...field} />
+                <Input type="email" disabled={isPending} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -77,7 +77,7 @@ export const InviteAdminForm: React.FC = () => {
             <FormItem>
               <FormLabel>Nombre</FormLabel>
               <FormControl>
-                <Input type="text" {...field} />
+                <Input type="text" disabled={isPending} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

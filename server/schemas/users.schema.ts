@@ -9,11 +9,13 @@ export const getUserSchema = z.object({
 });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email({
+    message: "Correo electrónico inválido",
+  }),
 });
 
 export const resetPasswordSchema = z.object({
-  token: z.string(),
+  token: z.string().min(1, { message: "El token es obligatorio" }),
   newPassword: z
     .string()
     .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })

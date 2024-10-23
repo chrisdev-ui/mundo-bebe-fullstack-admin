@@ -8,17 +8,13 @@ import { Header } from "@/components/email-blocks/header.section";
 type Section = "text" | "buttonContainer" | "button" | "content";
 
 interface WelcomeEmailProps {
-  emailAddress: string;
   role: "USER" | "ADMIN" | "SUPER_ADMIN";
   name: string;
-  code: string;
   webUrl: string;
 }
 
 export default function WelcomeEmail({
   role,
-  code,
-  emailAddress,
   name,
   webUrl,
 }: Partial<WelcomeEmailProps>): React.ReactElement {
@@ -26,8 +22,6 @@ export default function WelcomeEmail({
     role === "USER"
       ? "¡Bienvenido/a a Mundo Bebé!"
       : "¡Bienvenido/a a Mundo Bebé! Completa tu registro de administrador para continuar.";
-  const shopUrl = `${webUrl}/tienda`;
-  const adminRegisterUrl = `${webUrl}/registrarse?code=${code}&email=${emailAddress}`;
   return (
     <Email previewText={previewText}>
       <Container>
@@ -42,7 +36,7 @@ export default function WelcomeEmail({
                 completa.
               </Text>
               <Section style={styles.buttonContainer}>
-                <Button style={styles.button} href={shopUrl}>
+                <Button style={styles.button} href={webUrl}>
                   Ir a la tienda
                 </Button>
               </Section>
@@ -55,13 +49,13 @@ export default function WelcomeEmail({
                 todas las funcionalidades de la tienda.
               </Text>
               <Section style={styles.buttonContainer}>
-                <Button style={styles.button} href={adminRegisterUrl}>
+                <Button style={styles.button} href={webUrl}>
                   Completar registro
                 </Button>
               </Section>
               <Text style={styles.text}>
                 Si el botón no funciona, puedes dar clic en el siguiente enlace:{" "}
-                <Link href={adminRegisterUrl}>Haz clic aquí</Link>
+                <Link href={webUrl}>Haz clic aquí</Link>
               </Text>
             </>
           )}

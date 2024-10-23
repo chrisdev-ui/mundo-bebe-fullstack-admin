@@ -3,7 +3,7 @@ import { render } from "@react-email/components";
 import sendgrid, { MailDataRequired } from "@sendgrid/mail";
 import { z } from "zod";
 
-import ResetPasswordEmail from "@/components/emails/reset-password";
+import ResetPasswordEmail from "@/components/emails/reset-password-email";
 import WelcomeEmail from "@/components/emails/welcome-email";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
@@ -12,17 +12,13 @@ export const DeliverEmailSchema = z
   .discriminatedUnion("templateName", [
     z.object({
       templateName: z.literal("welcome"),
-      emailAddress: z.string().optional(),
       role: z.enum(["USER", "ADMIN", "SUPER_ADMIN"]).optional(),
       name: z.string().optional(),
-      code: z.string().optional(),
       webUrl: z.string().optional(),
     }),
     z.object({
       templateName: z.literal("reset_password"),
-      email: z.string().optional(),
       name: z.string().optional(),
-      token: z.string().optional(),
       webUrl: z.string().optional(),
     }),
   ])
@@ -76,10 +72,8 @@ const getEmailTemplate = (
       return {
         subject: "¡Bienvenido/a a Mundo Bebé!",
         component: React.createElement(WelcomeEmail, {
-          emailAddress: data.emailAddress,
           role: data.role,
           name: data.name,
-          code: data.code,
           webUrl: data.webUrl,
         }),
       };
@@ -87,9 +81,7 @@ const getEmailTemplate = (
       return {
         subject: "Recuperar contraseña",
         component: React.createElement(ResetPasswordEmail, {
-          email: data.email,
           name: data.name,
-          token: data.token,
           webUrl: data.webUrl,
         }),
       };

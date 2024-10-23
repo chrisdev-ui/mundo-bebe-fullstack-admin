@@ -8,19 +8,14 @@ import { Header } from "@/components/email-blocks/header.section";
 export type Section = "text" | "buttonContainer" | "button" | "content";
 
 interface ResetPasswordEmailProps {
-  email: string;
   name: string;
-  token: string;
   webUrl: string;
 }
 
 export default function ResetPasswordEmail({
-  token,
   name,
-  email,
   webUrl,
 }: Partial<ResetPasswordEmailProps>): React.ReactElement {
-  const resetPasswordLink = `${webUrl}/cambiar-password?token=${token}&email=${email}`;
   return (
     <Email previewText="Mundo Bebé reestablece tu contraseña">
       <Container>
@@ -32,18 +27,17 @@ export default function ResetPasswordEmail({
             tú, haz clic en el botón para completar el proceso:
           </Text>
           <Section style={styles.buttonContainer}>
-            <Button style={styles.button} href={resetPasswordLink}>
+            <Button style={styles.button} href={webUrl}>
               Cambiar contraseña
             </Button>
           </Section>
           <Text style={styles.text}>
-            Si el botón no funciona, puedes dar clic en el siguiente enlace o
-            copiar y pegarlo en tu navegador:
-            <Link href={resetPasswordLink}>{resetPasswordLink}</Link>
+            Si el botón no funciona, puedes dar clic en el siguiente enlace:{" "}
+            <Link href={webUrl}>Haz clic aquí</Link>
           </Text>
           <Text style={styles.text}>
             <b>
-              Si tú no quieres cambiar tu contraseña o no lo solicitaste, sólo
+              Si no quieres cambiar tu contraseña o no lo solicitaste, sólo
               ignora y elimina este correo.
             </b>
           </Text>
