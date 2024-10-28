@@ -1,6 +1,6 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import { Session } from "next-auth";
-import { OpenApiMeta } from "trpc-openapi";
+import { OpenApiMeta } from "trpc-to-openapi";
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
