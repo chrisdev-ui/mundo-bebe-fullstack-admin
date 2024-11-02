@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -124,17 +124,19 @@ export const ResetPasswordForm: React.FC = () => {
             )}
           />
         </div>
-        <Button
-          size="xl"
+        <LoadingButton
+          loadingStates={[
+            {
+              isLoading: isPending,
+              text: "Restableciendo contraseña",
+            },
+          ]}
           type="submit"
-          className="w-full"
-          disabled={isPending}
-          aria-disabled={isPending}
         >
           Restablecer contraseña
-        </Button>
+        </LoadingButton>
         {isError && (
-          <div className="animate-fade-right animate-once text-center text-sm">
+          <div className="animate-fade-right text-center text-sm animate-once">
             Ha ocurrido un error al restablecer la contraseña. Por favor,
             intenta generar un nuevo enlace aquí:
             <br />

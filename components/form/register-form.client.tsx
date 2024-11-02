@@ -4,11 +4,14 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconBrandGoogle, IconBrandInstagram } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import {
+  GoogleSignInButton,
+  InstagramSignInButton,
+} from "@/components/auth/auth-buttons.server";
+import { LoadingButton } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -93,11 +96,11 @@ export const RegisterForm: React.FC = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "Christian Gabriel",
-      lastName: "Torres Martinez",
-      email: email ?? "web.christian.dev@gmail.com",
-      password: "KtmN$Pqx1",
-      confirmPassword: "KtmN$Pqx1",
+      name: "",
+      lastName: "",
+      email: email ?? "",
+      password: "",
+      confirmPassword: "",
       role: "USER",
     },
   });
@@ -114,20 +117,29 @@ export const RegisterForm: React.FC = () => {
     createUser({ ...values, role: isValidCode ? "ADMIN" : "USER" });
   };
 
-  const isLoading = isPending || isFetching;
-
   useEffect(() => {
     if (isValidCode !== undefined && !isValidCode) {
       toast({
-        description: "Código de invitación no válido",
+        description: "Código de invitación no válido o vencido",
         variant: "destructive",
       });
     }
   }, [isValidCode, toast]);
 
+  const isLoadingStates = [
+    { isLoading: isFetching, text: "Validando código" },
+    { isLoading: isPending, text: "Creando cuenta" },
+  ];
+
+  const isLoading = isPending || isFetching;
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="grid gap-4"
+        aria-busy={isLoading}
+      >
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -201,34 +213,12 @@ export const RegisterForm: React.FC = () => {
             )}
           />
         </div>
-        <Button
-          size="xl"
-          type="submit"
-          className="w-full"
-          disabled={isLoading}
-          aria-disabled={isLoading}
-        >
+        <LoadingButton loadingStates={isLoadingStates} type="submit">
           Crear una cuenta
-        </Button>
+        </LoadingButton>
         <Separator />
-        <Button
-          variant="outline"
-          className="flex w-full gap-2.5"
-          disabled={isLoading}
-          aria-disabled={isLoading}
-        >
-          <IconBrandGoogle size={25} />
-          Registrarse con Google
-        </Button>
-        <Button
-          variant="outline"
-          className="flex w-full gap-2.5"
-          disabled={isLoading}
-          aria-disabled={isLoading}
-        >
-          <IconBrandInstagram size={25} />
-          Registrarse con Instagram
-        </Button>
+        <GoogleSignInButton isPending={isLoading} />
+        <InstagramSignInButton isPending={isLoading} />
         <div className="mt-4 text-center text-sm">
           ¿Ya tienes una cuenta?{" "}
           <Link href="/iniciar-sesion" className="underline">

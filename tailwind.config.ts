@@ -84,10 +84,15 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        balance: {
+          "0%, 100%": { transform: "rotate(var(--balance-deg-inverse))" },
+          "50%": { transform: "rotate(var(--balance-deg))" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        balance: "balance 1s ease-in-out infinite",
       },
     },
   },

@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -83,15 +83,17 @@ export const InviteAdminForm: React.FC = () => {
             </FormItem>
           )}
         />
-        <Button
-          size="xl"
+        <LoadingButton
+          loadingStates={[
+            {
+              isLoading: isPending,
+              text: "Enviando invitación",
+            },
+          ]}
           type="submit"
-          className="w-full"
-          disabled={isPending}
-          aria-disabled={isPending}
         >
           Enviar invitación
-        </Button>
+        </LoadingButton>
       </form>
     </Form>
   );

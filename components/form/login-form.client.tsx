@@ -14,7 +14,7 @@ import {
   GoogleSignInButton,
   InstagramSignInButton,
 } from "@/components/auth/auth-buttons.server";
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -102,15 +102,17 @@ export const LoginForm: React.FC = () => {
         >
           ¿Olvidaste tu contraseña?
         </Link>
-        <Button
-          size="xl"
+        <LoadingButton
+          loadingStates={[
+            {
+              isLoading: isPending,
+              text: "Iniciando sesión",
+            },
+          ]}
           type="submit"
-          className="w-full"
-          disabled={isPending}
-          aria-disabled={isPending}
         >
           Iniciar sesión
-        </Button>
+        </LoadingButton>
         {state?.message !== "" && !state.issues && (
           <div className="text-center text-sm text-red-500">
             {state.message}

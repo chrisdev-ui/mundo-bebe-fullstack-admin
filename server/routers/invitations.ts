@@ -50,6 +50,17 @@ export const invitationsRouter = router({
         });
       }
       try {
+        const existingUser = await ctx.db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.email, input.email),
+        });
+
+        if (existingUser) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Este correo electrónico ya está registrado como usuario",
+          });
+        }
+
         const userHasActiveInvitation = await ctx.db.query.invites.findFirst({
           where: (invites, { eq, and, lt }) =>
             and(
@@ -85,6 +96,9 @@ export const invitationsRouter = router({
           },
         });
       } catch (e) {
+        if (e instanceof TRPCError) {
+          throw e;
+        }
         console.error(e);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

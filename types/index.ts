@@ -11,3 +11,8 @@ export type FormState = {
   fields?: Record<string, string>;
   issues?: string[];
 };
+
+export type LoadingState = {
+  isLoading: boolean;
+  text: string;
+};

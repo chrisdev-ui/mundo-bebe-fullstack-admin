@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Button } from "@/components/ui/button";
+import { LoadingButton } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -78,9 +78,17 @@ export const ForgotPasswordForm: React.FC = () => {
             )}
           />
         </div>
-        <Button type="submit" disabled={isPending} className="w-full">
+        <LoadingButton
+          loadingStates={[
+            {
+              isLoading: isPending,
+              text: "Recuperando contraseña",
+            },
+          ]}
+          type="submit"
+        >
           Recuperar contraseña
-        </Button>
+        </LoadingButton>
         <div className="mt-4 text-center text-sm">
           ¿Recordaste tu contraseña?{" "}
           <Link href="/iniciar-sesion" className="underline">
