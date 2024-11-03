@@ -1,23 +1,23 @@
 import "dotenv/config";
 
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Client } from "pg";
+import { Pool } from "pg";
 
 import * as schema from "./schema";
 
 declare global {
-  var _pgClient: Client | undefined;
+  var _pgPool: Pool | undefined;
 }
 
-let client: Client;
+let pool: Pool;
 
-if (process.env.NODE_ENV === "development" && globalThis._pgClient) {
-  client = globalThis._pgClient;
+if (process.env.NODE_ENV === "development" && globalThis._pgPool) {
+  pool = globalThis._pgPool;
 } else {
-  client = new Client({ connectionString: process.env.XATA_POSTGRES_URL! });
-  globalThis._pgClient = client;
+  pool = new Pool({ connectionString: process.env.XATA_POSTGRES_URL! });
+  globalThis._pgPool = pool;
   try {
-    await client.connect();
+    await pool.connect();
     console.log("Connected to database successfully");
   } catch (error: any) {
     console.error("Failed to connect to database", error.message);
@@ -25,13 +25,13 @@ if (process.env.NODE_ENV === "development" && globalThis._pgClient) {
   }
 }
 
-const db = drizzle(client, {
+const db = drizzle(pool, {
   schema,
   logger: true,
 });
 
 process.on("SIGINT", () => {
-  client.end().then(() => {
+  pool.end().then(() => {
     console.log("Disconnected from database");
     process.exit(0);
   });
