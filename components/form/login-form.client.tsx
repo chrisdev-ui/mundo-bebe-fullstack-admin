@@ -60,9 +60,11 @@ export const LoginForm: React.FC = () => {
 
   useEffect(() => {
     if (state?.message !== "") {
-      setTimeout(() => {
+      const timeout = setTimeout(() => {
         setState(undefined);
       }, 2000);
+
+      return () => clearTimeout(timeout);
     }
   }, [state]);
 
