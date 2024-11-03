@@ -9,7 +9,7 @@ import { loginFormSchema } from "@/types/schemas";
 export async function initActions(): Promise<void> {}
 
 export async function authenticate(
-  prevState: FormState,
+  prevState: FormState | undefined,
   data: FormData,
 ): Promise<FormState> {
   const formData = Object.fromEntries(data);

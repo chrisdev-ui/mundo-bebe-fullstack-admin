@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { IconX } from "@tabler/icons-react";
-import { useSession } from "next-auth/react";
-import { useFormState } from "react-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -27,15 +24,12 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { authenticate } from "@/lib/actions";
+import { FormState } from "@/types";
 import { loginFormSchema as formSchema } from "@/types/schemas";
 
 export const LoginForm: React.FC = () => {
-  const router = useRouter();
-  const { data: session } = useSession();
-  const [state, formAction, isPending] = useFormState(authenticate, {
-    message: "",
-  });
-
+  const [state, setState] = useState<FormState>();
+  const [isPending, setIsPending] = useState<boolean>(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,27 +39,36 @@ export const LoginForm: React.FC = () => {
     },
   });
 
-  const formRef = useRef<HTMLFormElement>(null);
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const formData = new FormData();
+    formData.append("username", values.username);
+    formData.append("password", values.password);
+    try {
+      setIsPending(true);
+      const newState = await authenticate(undefined, formData);
+      setState(newState);
+      setIsPending(false);
+    } catch (error) {
+      setIsPending(false);
+      setState({
+        message: "Algo salió mal. Por favor, intenta de nuevo",
+      });
+    } finally {
+      setIsPending(false);
+    }
+  };
 
   useEffect(() => {
-    if (session?.user) {
-      router.push("/");
+    if (state?.message !== "") {
+      setTimeout(() => {
+        setState(undefined);
+      }, 2000);
     }
-  }, [session, router]);
+  }, [state]);
 
   return (
     <Form {...form}>
-      <form
-        ref={formRef}
-        action={formAction}
-        onSubmit={(evt) => {
-          evt.preventDefault();
-          form.handleSubmit(() => {
-            formAction(new FormData(formRef.current!));
-          })(evt);
-        }}
-        className="grid gap-4"
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
         <div className="grid gap-2">
           <FormField
             control={form.control}
@@ -113,9 +116,9 @@ export const LoginForm: React.FC = () => {
         >
           Iniciar sesión
         </LoadingButton>
-        {state?.message !== "" && !state.issues && (
+        {state?.message !== "" && !state?.issues && (
           <div className="text-center text-sm text-red-500">
-            {state.message}
+            {state?.message}
           </div>
         )}
         {state?.issues && (
