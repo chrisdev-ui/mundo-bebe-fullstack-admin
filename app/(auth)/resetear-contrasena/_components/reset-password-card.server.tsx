@@ -1,5 +1,5 @@
-import { ResetPasswordForm } from "@/components/form/reset-password-form.client";
 import { AuthCardContainer } from "@/components/layout/auth-card-container.server";
+import { ResetPasswordForm } from "./reset-password-form.client";
 
 export const ResetPasswordCard: React.FC = () => {
   return (

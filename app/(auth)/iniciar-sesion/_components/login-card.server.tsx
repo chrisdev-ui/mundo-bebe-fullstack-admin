@@ -1,5 +1,5 @@
-import { LoginForm } from "@/components/form/login-form.client";
-import { AuthCardContainer } from "./auth-card-container.server";
+import { AuthCardContainer } from "@/components/layout/auth-card-container.server";
+import { LoginForm } from "./login-form.client";
 
 export const LoginCard: React.FC = () => {
   return (

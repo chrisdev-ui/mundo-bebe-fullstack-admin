@@ -1,5 +1,5 @@
-import { ForgotPasswordForm } from "@/components/form/forgot-password-form.client";
-import { AuthCardContainer } from "./auth-card-container.server";
+import { AuthCardContainer } from "@/components/layout/auth-card-container.server";
+import { ForgotPasswordForm } from "./forgot-password-form.client";
 
 export const ForgotPasswordCard: React.FC = () => {
   return (

@@ -1,5 +1,5 @@
-import { InviteAdminForm } from "@/components/form/invite-admin-form.client";
-import { AuthCardContainer } from "./auth-card-container.server";
+import { AuthCardContainer } from "@/components/layout/auth-card-container.server";
+import { InviteAdminForm } from "./invite-admin-form.client";
 
 export const InviteAdminCard: React.FC = () => {
   return (
