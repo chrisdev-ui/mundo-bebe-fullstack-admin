@@ -1,18 +1,14 @@
-import { auth } from "@/auth";
-import { Forbidden } from "@/components/auth/forbidden.client";
+import { createModuleAccessChecker } from "@/lib/auth";
+import { AccessModules } from "@/types";
+
+const AccessModule: AccessModules = "admin";
+const checkAdminAccess = createModuleAccessChecker(AccessModule, "/");
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-  const userHasAccess =
-    session?.user?.role === "SUPER_ADMIN" || session?.user.role === "ADMIN";
-
-  if (!userHasAccess) {
-    return <Forbidden />;
-  }
-
+  await checkAdminAccess();
   return children;
 }

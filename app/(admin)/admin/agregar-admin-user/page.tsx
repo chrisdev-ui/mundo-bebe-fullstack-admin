@@ -1,16 +1,11 @@
-import { auth } from "@/auth";
-import { Forbidden } from "@/components/auth/forbidden.client";
 import { AuthContainer } from "@/components/layout/auth-container.server";
 import { InviteAdminCard } from "@/components/layout/invite-admin-card.server";
+import { checkModuleAccess } from "@/lib/auth";
+import { AccessModules } from "@/types";
 
+const AccessModule: AccessModules = "super-admin";
 export default async function InviteAdminPage() {
-  const session = await auth();
-  const userHasAccess = session?.user?.role === "SUPER_ADMIN";
-
-  if (!userHasAccess) {
-    return <Forbidden />;
-  }
-
+  await checkModuleAccess(AccessModule, "admin/panel");
   return (
     <AuthContainer>
       <InviteAdminCard />

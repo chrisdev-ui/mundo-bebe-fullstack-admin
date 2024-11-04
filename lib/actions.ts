@@ -3,50 +3,31 @@
 import { AuthError } from "next-auth";
 
 import { signIn, signOut } from "@/auth";
-import { FormState } from "@/types";
 import { loginFormSchema } from "@/types/schemas";
 
 export async function initActions(): Promise<void> {}
 
-export async function authenticate(
-  prevState: FormState | undefined,
-  data: FormData,
-): Promise<FormState> {
+export async function authenticate({
+  data,
+  redirectTo = "/",
+}: {
+  data: FormData;
+  redirectTo?: string;
+}) {
   const formData = Object.fromEntries(data);
   const parsedFormData = loginFormSchema.safeParse(formData);
   if (!parsedFormData.success) {
-    const fields: Record<string, string> = {};
-    for (const key of Object.keys(formData)) {
-      fields[key] = formData[key].toString();
-    }
-    return {
-      message: "Las credenciales son inválidas",
-      fields,
-      issues: parsedFormData.error.issues.map((issue) => issue.message),
-    };
+    throw new Error("Las credenciales son inválidas");
   }
   try {
     await signIn("credentials", {
-      redirectTo: "/",
       ...parsedFormData.data,
+      redirectTo,
     });
-
-    return {
-      message: "",
-    };
   } catch (error) {
     if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return {
-            message: `${error.message.split(".")[0]}.`,
-            fields: parsedFormData.data,
-          };
-        default:
-          return {
-            message: error.message,
-            fields: parsedFormData.data,
-          };
+      if (error.type === "CredentialsSignin") {
+        throw new Error(`${error.message.split(".")[0]}.`);
       }
     }
     throw error;

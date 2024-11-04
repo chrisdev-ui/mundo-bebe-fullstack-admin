@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { MODULES } from "@/constants";
 import { authUserSelect, userSelect } from "@/server/schemas";
 
 export type User = z.infer<typeof userSelect>;
@@ -16,3 +17,5 @@ export type LoadingState = {
   isLoading: boolean;
   text: string;
 };
+
+export type AccessModules = (typeof MODULES)[number];

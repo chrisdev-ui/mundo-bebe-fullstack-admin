@@ -4,3 +4,5 @@ export const PASSWORD_VALIDATION_REGEX =
 export const ADMIN_EMAILS = ["web.christian.dev@gmail.com"];
 
 export const PASSWORD_CHANGE_COOLDOWN_MINUTES = 60;
+
+export const MODULES = ["admin", "super-admin", "user", "guest"] as const;

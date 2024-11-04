@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { IconX } from "@tabler/icons-react";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -23,50 +23,49 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/lib/actions";
-import { FormState } from "@/types";
 import { loginFormSchema as formSchema } from "@/types/schemas";
 
 export const LoginForm: React.FC = () => {
-  const [state, setState] = useState<FormState>();
-  const [isPending, setIsPending] = useState<boolean>(false);
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+
+  const callbackUrl = searchParams.get("callbackUrl");
+
+  const { mutate: auth, isPending } = useMutation({
+    mutationFn: authenticate,
+    onSuccess: () => {
+      toast({
+        description: "Sesión iniciada exitosamente",
+        variant: "success",
+      });
+    },
+    onError: (error) => {
+      toast({
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "web.christian.dev@gmail.com",
       password: "KtmN$Pqx128",
-      ...(state?.fields ?? {}),
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     const formData = new FormData();
     formData.append("username", values.username);
     formData.append("password", values.password);
-    try {
-      setIsPending(true);
-      const newState = await authenticate(undefined, formData);
-      setState(newState);
-      setIsPending(false);
-    } catch (error) {
-      setIsPending(false);
-      setState({
-        message: "Algo salió mal. Por favor, intenta de nuevo",
-      });
-    } finally {
-      setIsPending(false);
-    }
+    auth({
+      data: formData,
+      redirectTo: callbackUrl ?? "/",
+    });
   };
-
-  useEffect(() => {
-    if (state?.message !== "") {
-      const timeout = setTimeout(() => {
-        setState(undefined);
-      }, 2000);
-
-      return () => clearTimeout(timeout);
-    }
-  }, [state]);
 
   return (
     <Form {...form}>
@@ -118,23 +117,6 @@ export const LoginForm: React.FC = () => {
         >
           Iniciar sesión
         </LoadingButton>
-        {state?.message !== "" && !state?.issues && (
-          <div className="text-center text-sm text-red-500">
-            {state?.message}
-          </div>
-        )}
-        {state?.issues && (
-          <div className="text-center text-sm text-red-500">
-            <ul>
-              {state.issues.map((issue) => (
-                <li key={issue} className="flex gap-1">
-                  <IconX color="red" />
-                  {issue}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
         <Separator />
         <GoogleSignInButton isPending={isPending} />
         <InstagramSignInButton isPending={isPending} />

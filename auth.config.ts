@@ -8,19 +8,28 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const isAdminRoute =
-        nextUrl.pathname.startsWith("/admin") ||
-        nextUrl.pathname.startsWith("/super-admin");
 
-      if (isAdminRoute) {
-        if (isLoggedIn) {
-          return true;
-        } else {
-          return Response.redirect(new URL("/", nextUrl));
-        }
-      } else {
-        return isLoggedIn;
+      const isAdminRoute = nextUrl.pathname.startsWith("/admin");
+
+      const isAuthFlow =
+        nextUrl.pathname.startsWith("/registrarse") ||
+        nextUrl.pathname.startsWith("/recuperar-contrasena") ||
+        nextUrl.pathname.startsWith("/resetear-contrasena") ||
+        nextUrl.pathname.startsWith("/iniciar-sesion");
+
+      if (isAuthFlow && isLoggedIn) {
+        return Response.redirect(new URL("/", nextUrl));
       }
+
+      if (isAdminRoute && isLoggedIn) {
+        return true;
+      }
+
+      if (isAdminRoute && !isLoggedIn) {
+        return false;
+      }
+
+      return isLoggedIn;
     },
   },
   providers: [],
