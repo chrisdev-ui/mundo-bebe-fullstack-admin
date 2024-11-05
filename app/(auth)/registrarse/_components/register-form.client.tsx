@@ -23,8 +23,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/components/ui/use-toast";
 import { PASSWORD_VALIDATION_REGEX } from "@/constants";
+import { useToast } from "@/hooks/use-toast";
 import { trpc } from "@/server/client";
 
 const formSchema = z

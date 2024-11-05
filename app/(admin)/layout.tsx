@@ -1,3 +1,4 @@
+import { AppSidebar } from "@/components/layout/app-sidebar.client";
 import { createModuleAccessChecker } from "@/lib/auth";
 import { AccessModules } from "@/types";
 
@@ -10,5 +11,5 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   await checkAdminAccess();
-  return children;
+  return <AppSidebar>{children}</AppSidebar>;
 }

@@ -22,3 +22,5 @@
 !/server
 !/providers
 !/auth
+!/hooks
+!/styles

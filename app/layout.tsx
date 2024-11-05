@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Baloo_2 as FontSans } from "next/font/google";
 
-import "./globals.css";
+import "@/styles/globals.css";
 
-import { Toaster } from "@/components/ui/toaster";
+import NextTopLoader from "nextjs-toploader";
+
 import { initActions } from "@/lib/actions";
 import { cn } from "@/lib/utils";
 import { TRPCProvider } from "@/providers/trpc-provider";
@@ -25,15 +26,10 @@ export default async function RootLayout({
 }>) {
   await initActions(); // dirty hack to avoid await top-level issue with server actions in Next.js
   return (
-    <html lang="es">
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable,
-        )}
-      >
+    <html lang="es" className={cn(fontSans.variable)}>
+      <body className={cn("overflow-hidden")}>
+        <NextTopLoader color="#65C4BC" showSpinner={false} />
         <TRPCProvider>{children}</TRPCProvider>
-        <Toaster />
       </body>
     </html>
   );

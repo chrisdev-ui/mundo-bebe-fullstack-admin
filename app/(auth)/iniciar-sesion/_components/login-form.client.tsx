@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { authenticate } from "@/lib/actions";
 import { loginFormSchema as formSchema } from "@/types/schemas";
 
