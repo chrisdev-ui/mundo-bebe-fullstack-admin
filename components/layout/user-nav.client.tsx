@@ -15,9 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/lib/actions";
+import { Skeleton } from "../ui/skeleton";
 
 export const UserNav: React.FC = () => {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <Skeleton className="h-8 w-8 rounded-full" />;
+  }
 
   if (session) {
     return (
