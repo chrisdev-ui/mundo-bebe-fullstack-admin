@@ -43,6 +43,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSkeleton,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
@@ -50,6 +51,7 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Company, navItems } from "@/constants";
 import { filterNavItems } from "@/lib/utils";
 import { UserRole } from "@/types";
@@ -58,16 +60,14 @@ export const AppSidebar: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const pathname = usePathname();
-  const { data: session } = useSession();
-
-  if (!session?.user) {
-    return <>{children}</>;
-  }
+  const { data: session, status } = useSession();
 
   const filteredNavItems = filterNavItems(
     navItems,
-    session.user.role as UserRole,
+    session?.user.role as UserRole,
   );
+
+  const isLoading = status === "loading";
 
   return (
     <SidebarProvider>
@@ -87,143 +87,161 @@ export const AppSidebar: React.FC<{
           <SidebarGroup>
             <SidebarGroupLabel>General</SidebarGroupLabel>
             <SidebarMenu>
-              {filteredNavItems.map((item) => {
-                const Icon = item.icon ? Icons[item.icon] : Icons.item;
-                return item?.items && item.items.length > 0 ? (
-                  <Collapsible
-                    key={item.title}
-                    asChild
-                    defaultOpen={item.isActive}
-                    className="group/collapsible"
-                  >
-                    <SidebarMenuItem>
-                      <CollapsibleTrigger asChild>
+              {isLoading
+                ? Array.from({ length: 5 }, (_, i) => (
+                    <SidebarMenuItem key={i}>
+                      <SidebarMenuSkeleton showIcon />
+                    </SidebarMenuItem>
+                  ))
+                : filteredNavItems.map((item) => {
+                    const Icon = item.icon ? Icons[item.icon] : Icons.item;
+                    return item?.items && item.items.length > 0 ? (
+                      <Collapsible
+                        key={item.title}
+                        asChild
+                        defaultOpen={item.isActive}
+                        className="group/collapsible"
+                      >
+                        <SidebarMenuItem>
+                          <CollapsibleTrigger asChild>
+                            <SidebarMenuButton
+                              tooltip={item.title}
+                              isActive={pathname === item.url}
+                            >
+                              {item.icon && <Icon />}
+                              <span>{item.title}</span>
+                              <Icons.chevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                            </SidebarMenuButton>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <SidebarMenuSub>
+                              {item.items.map((subItem) => (
+                                <SidebarMenuSubItem key={subItem.title}>
+                                  <SidebarMenuSubButton
+                                    asChild
+                                    isActive={pathname === subItem.url}
+                                  >
+                                    <Link href={subItem.url}>
+                                      <span>{subItem.title}</span>
+                                    </Link>
+                                  </SidebarMenuSubButton>
+                                </SidebarMenuSubItem>
+                              ))}
+                            </SidebarMenuSub>
+                          </CollapsibleContent>
+                        </SidebarMenuItem>
+                      </Collapsible>
+                    ) : (
+                      <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
+                          asChild
                           tooltip={item.title}
                           isActive={pathname === item.url}
                         >
-                          {item.icon && <Icon />}
-                          <span>{item.title}</span>
-                          <Icons.chevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          <Link href={item.url}>
+                            <Icon />
+                            <span>{item.title}</span>
+                          </Link>
                         </SidebarMenuButton>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent>
-                        <SidebarMenuSub>
-                          {item.items.map((subItem) => (
-                            <SidebarMenuSubItem key={subItem.title}>
-                              <SidebarMenuSubButton
-                                asChild
-                                isActive={pathname === subItem.url}
-                              >
-                                <Link href={subItem.url}>
-                                  <span>{subItem.title}</span>
-                                </Link>
-                              </SidebarMenuSubButton>
-                            </SidebarMenuSubItem>
-                          ))}
-                        </SidebarMenuSub>
-                      </CollapsibleContent>
-                    </SidebarMenuItem>
-                  </Collapsible>
-                ) : (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      tooltip={item.title}
-                      isActive={pathname === item.url}
-                    >
-                      <Link href={item.url}>
-                        <Icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                      </SidebarMenuItem>
+                    );
+                  })}
             </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
           <SidebarMenu>
             <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  >
-                    <Avatar className="size-8 rounded-lg">
-                      <AvatarImage
-                        src={session.user.image ?? ""}
-                        alt={`${session.user.name} ${session.user.lastName}`}
-                      />
-                      <AvatarFallback className="rounded-lg">
-                        {session.user.name?.slice(0, 2)?.toUpperCase() ?? "MB"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {session.user.name ?? ""} {session.user.lastName ?? ""}
-                      </span>
-                      <span className="truncate text-xs">
-                        {session.user.email ?? ""}
-                      </span>
-                    </div>
-                    <IconSelector className="ml-auto size-4" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                  side="bottom"
-                  align="end"
-                  sideOffset={4}
-                >
-                  <DropdownMenuLabel className="p-0 font-normal">
-                    <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+              {isLoading ? (
+                <div className="flex items-center gap-2 p-2">
+                  <Skeleton className="h-8 w-8 rounded-lg" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[100px]" />
+                    <Skeleton className="h-3 w-[80px]" />
+                  </div>
+                </div>
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <SidebarMenuButton
+                      size="lg"
+                      className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    >
                       <Avatar className="size-8 rounded-lg">
                         <AvatarImage
-                          src={session.user.image ?? ""}
-                          alt={`${session.user.name} ${session.user.lastName}`}
+                          src={session?.user.image ?? ""}
+                          alt={`${session?.user.name} ${session?.user.lastName}`}
                         />
                         <AvatarFallback className="rounded-lg">
-                          {session.user.name?.slice(0, 2)?.toUpperCase() ??
+                          {session?.user.name?.slice(0, 2)?.toUpperCase() ??
                             "MB"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">
-                          {session.user.name ?? ""}{" "}
-                          {session.user.lastName ?? ""}
+                          {session?.user.name ?? ""}{" "}
+                          {session?.user.lastName ?? ""}
                         </span>
                         <span className="truncate text-xs">
-                          {" "}
-                          {session.user.email ?? ""}
+                          {session?.user.email ?? ""}
                         </span>
                       </div>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
+                      <IconSelector className="ml-auto size-4" />
+                    </SidebarMenuButton>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+                    side="bottom"
+                    align="end"
+                    sideOffset={4}
+                  >
+                    <DropdownMenuLabel className="p-0 font-normal">
+                      <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                        <Avatar className="size-8 rounded-lg">
+                          <AvatarImage
+                            src={session?.user.image ?? ""}
+                            alt={`${session?.user.name} ${session?.user.lastName}`}
+                          />
+                          <AvatarFallback className="rounded-lg">
+                            {session?.user.name?.slice(0, 2)?.toUpperCase() ??
+                              "MB"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-semibold">
+                            {session?.user.name ?? ""}{" "}
+                            {session?.user.lastName ?? ""}
+                          </span>
+                          <span className="truncate text-xs">
+                            {" "}
+                            {session?.user.email ?? ""}
+                          </span>
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem>
+                        <IconRosetteDiscountCheck />
+                        Account
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <IconCreditCard />
+                        Billing
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <IconBell />
+                        Notifications
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem>
-                      <IconRosetteDiscountCheck />
-                      Account
+                      <IconLogout />
+                      Log out
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <IconCreditCard />
-                      Billing
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <IconBell />
-                      Notifications
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <IconLogout />
-                    Log out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarFooter>
