@@ -5,6 +5,14 @@ import { NavItem, RouteMap, UserRole } from "@/types";
 export const PASSWORD_VALIDATION_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
+export const PASSWORD_REQUIREMENTS = [
+  { regex: /.{8,}/, text: "Al menos 8 caracteres" },
+  { regex: /[0-9]/, text: "Al menos 1 número" },
+  { regex: /[a-z]/, text: "Al menos 1 minúscula" },
+  { regex: /[A-Z]/, text: "Al menos 1 mayúscula" },
+  { regex: /[@$!%*?&]/, text: "Al menos un carácter especial (@$!%*?&)" },
+];
+
 export const ADMIN_EMAILS = ["web.christian.dev@gmail.com"];
 
 export const PASSWORD_CHANGE_COOLDOWN_MINUTES = 60;

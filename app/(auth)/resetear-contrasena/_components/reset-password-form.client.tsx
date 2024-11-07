@@ -23,22 +23,8 @@ import { trpc } from "@/server/client";
 
 const formSchema = z
   .object({
-    newPassword: z
-      .string()
-      .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
-      .max(16, { message: "La contraseña no puede tener más de 16 caracteres" })
-      .regex(PASSWORD_VALIDATION_REGEX, {
-        message:
-          "Tu contraseña no es válida. Debe contener al menos una letra minúscula, una letra mayúscula, un dígito y un carácter especial",
-      }),
-    confirmPassword: z
-      .string()
-      .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
-      .max(16)
-      .regex(PASSWORD_VALIDATION_REGEX, {
-        message:
-          "Tu contraseña no es válida. Debe contener al menos una letra minúscula, una letra mayúscula, un dígito y un carácter especial",
-      }),
+    newPassword: z.string().regex(PASSWORD_VALIDATION_REGEX),
+    confirmPassword: z.string().regex(PASSWORD_VALIDATION_REGEX),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Las contraseñas no coinciden",

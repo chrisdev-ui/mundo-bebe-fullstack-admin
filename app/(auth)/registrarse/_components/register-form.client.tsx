@@ -35,22 +35,8 @@ const formSchema = z
       .min(1, { message: "El apellido es requerido" })
       .max(50),
     email: z.string().email({ message: "Correo electrónico inválido" }),
-    password: z
-      .string()
-      .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
-      .max(16, { message: "La contraseña no puede tener más de 16 caracteres" })
-      .regex(PASSWORD_VALIDATION_REGEX, {
-        message:
-          "Tu contraseña no es válida. Debe contener al menos una letra minúscula, una letra mayúscula, un dígito y un carácter especial",
-      }),
-    confirmPassword: z
-      .string()
-      .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
-      .max(16)
-      .regex(PASSWORD_VALIDATION_REGEX, {
-        message:
-          "Tu contraseña no es válida. Debe contener al menos una letra minúscula, una letra mayúscula, un dígito y un carácter especial",
-      }),
+    password: z.string().regex(PASSWORD_VALIDATION_REGEX),
+    confirmPassword: z.string().regex(PASSWORD_VALIDATION_REGEX),
     role: z.enum(["USER", "ADMIN"]).default("USER"),
   })
   .refine((data) => data.password === data.confirmPassword, {

@@ -93,7 +93,11 @@ export const LoginForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Contraseña</FormLabel>
                 <FormControl>
-                  <PasswordInput disabled={isPending} {...field} />
+                  <PasswordInput
+                    showStrengthIndicator={false}
+                    disabled={isPending}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
