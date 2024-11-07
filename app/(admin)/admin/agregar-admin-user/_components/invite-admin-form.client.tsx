@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -20,7 +19,6 @@ import { trpc } from "@/server/client";
 import { inviteAdminSchema as formSchema } from "@/types/schemas";
 
 export const InviteAdminForm: React.FC = () => {
-  const router = useRouter();
   const { toast } = useToast();
 
   const { mutate: createInvitation, isPending } =
@@ -64,7 +62,7 @@ export const InviteAdminForm: React.FC = () => {
             <FormItem>
               <FormLabel>Correo electrónico</FormLabel>
               <FormControl>
-                <Input type="email" disabled={isPending} {...field} />
+                <Input disabled={isPending} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

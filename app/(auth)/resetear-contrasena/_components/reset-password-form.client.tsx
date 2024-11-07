@@ -23,8 +23,22 @@ import { trpc } from "@/server/client";
 
 const formSchema = z
   .object({
-    newPassword: z.string().regex(PASSWORD_VALIDATION_REGEX),
-    confirmPassword: z.string().regex(PASSWORD_VALIDATION_REGEX),
+    newPassword: z
+      .string()
+      .min(1, {
+        message: "La contraseña es requerida",
+      })
+      .regex(PASSWORD_VALIDATION_REGEX, {
+        message: "La contraseña es inválida",
+      }),
+    confirmPassword: z
+      .string()
+      .min(1, {
+        message: "La contraseña es requerida",
+      })
+      .regex(PASSWORD_VALIDATION_REGEX, {
+        message: "La contraseña es inválida",
+      }),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -70,6 +84,7 @@ export const ResetPasswordForm: React.FC = () => {
     resetPasswordSubmit({
       token: token as string,
       newPassword: values.newPassword,
+      confirmNewPassword: values.confirmPassword,
     });
   };
 

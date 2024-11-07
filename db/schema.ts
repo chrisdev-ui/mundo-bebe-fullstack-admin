@@ -27,7 +27,7 @@ export const users = pgTable(
     email: text("email").unique(),
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     role: text("role")
-      .$type<"USER" | "ADMIN" | "SUPER_ADMIN">()
+      .$type<"USER" | "ADMIN" | "SUPER_ADMIN" | "GUEST">()
       .notNull()
       .default("USER"),
     image: text("image"),

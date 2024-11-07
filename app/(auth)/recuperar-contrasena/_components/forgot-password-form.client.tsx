@@ -19,7 +19,13 @@ import { useToast } from "@/hooks/use-toast";
 import { trpc } from "@/server/client";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Correo electrónico inválido" }),
+  email: z
+    .string()
+    .trim()
+    .min(1, {
+      message: "El correo electrónico es requerido",
+    })
+    .email({ message: "El correo electrónico es inválido" }),
 });
 
 export const ForgotPasswordForm: React.FC = () => {
@@ -67,7 +73,6 @@ export const ForgotPasswordForm: React.FC = () => {
                 <FormLabel>Correo electrónico</FormLabel>
                 <FormControl>
                   <Input
-                    type="email"
                     placeholder="Tu correo electrónico"
                     disabled={isPending}
                     {...field}

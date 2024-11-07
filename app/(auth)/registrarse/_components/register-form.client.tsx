@@ -29,15 +29,42 @@ import { trpc } from "@/server/client";
 
 const formSchema = z
   .object({
-    name: z.string().min(1, { message: "El nombre es requerido" }).max(50),
+    name: z
+      .string()
+      .trim()
+      .min(1, { message: "El nombre es requerido" })
+      .max(50, {
+        message: "El nombre no puede tener más de 50 caracteres",
+      }),
     lastName: z
       .string()
+      .trim()
       .min(1, { message: "El apellido es requerido" })
-      .max(50),
-    email: z.string().email({ message: "Correo electrónico inválido" }),
-    password: z.string().regex(PASSWORD_VALIDATION_REGEX),
-    confirmPassword: z.string().regex(PASSWORD_VALIDATION_REGEX),
-    role: z.enum(["USER", "ADMIN"]).default("USER"),
+      .max(50, {
+        message: "El apellido no puede tener más de 50 caracteres",
+      }),
+    email: z
+      .string()
+      .trim()
+      .min(1, {
+        message: "El correo electrónico es requerido",
+      })
+      .email({ message: "El correo electrónico es inválido" }),
+    password: z
+      .string()
+      .min(1, { message: "La contraseña es requerida" })
+      .regex(PASSWORD_VALIDATION_REGEX, {
+        message: "La contraseña no cumple con los requisitos",
+      }),
+    confirmPassword: z
+      .string()
+      .min(1, {
+        message: "La contraseña es requerida",
+      })
+      .regex(PASSWORD_VALIDATION_REGEX, {
+        message: "La contraseña no cumple con los requisitos",
+      }),
+    role: z.enum(["USER", "ADMIN", "GUEST"]).default("USER"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -162,7 +189,7 @@ export const RegisterForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Correo electrónico</FormLabel>
                 <FormControl>
-                  <Input type="email" disabled={isLoading} {...field} />
+                  <Input disabled={isLoading} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -106,7 +106,7 @@ export const LoginForm: React.FC = () => {
         </div>
         <Link
           href="/recuperar-contrasena"
-          className="text-right text-sm underline"
+          className="ml-auto w-max text-right text-sm underline"
         >
           ¿Olvidaste tu contraseña?
         </Link>

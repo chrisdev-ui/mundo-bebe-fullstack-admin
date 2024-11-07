@@ -108,12 +108,13 @@ export const usersRouter = router({
 
       if (
         input.role !== "USER" &&
+        input.role !== "GUEST" &&
         input.role !== "ADMIN" &&
         input.role !== "SUPER_ADMIN"
       ) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "El rol debe ser USER, ADMIN o SUPER_ADMIN",
+          message: "El rol debe ser USER, GUEST, ADMIN o SUPER_ADMIN",
         });
       }
 
@@ -238,6 +239,13 @@ export const usersRouter = router({
           code: "BAD_REQUEST",
           message: "Ha ocurrido un error con los datos del formulario",
           cause: parsedInput.error.issues.map((err) => err.message).join(", "),
+        });
+      }
+
+      if (input.newPassword !== input.confirmNewPassword) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Las contraseñas no coinciden",
         });
       }
 

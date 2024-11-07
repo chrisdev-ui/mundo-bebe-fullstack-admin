@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { PASSWORD_VALIDATION_REGEX } from "@/constants";
+
 export const getUserSchema = z.object({
   name: z.string().optional(),
   lastName: z.string().optional(),
@@ -9,15 +11,32 @@ export const getUserSchema = z.object({
 });
 
 export const forgotPasswordSchema = z.object({
-  email: z.string().email({
-    message: "Correo electrónico inválido",
-  }),
+  email: z
+    .string()
+    .min(1, {
+      message: "Correo electrónico es obligatorio",
+    })
+    .email({
+      message: "Correo electrónico inválido",
+    }),
 });
 
 export const resetPasswordSchema = z.object({
   token: z.string().min(1, { message: "El token es obligatorio" }),
   newPassword: z
     .string()
-    .min(8, { message: "La contraseña debe tener al menos 8 caracteres" })
-    .max(16, { message: "La contraseña no puede tener más de 16 caracteres" }),
+    .min(1, {
+      message: "La contraseña es requerida",
+    })
+    .regex(PASSWORD_VALIDATION_REGEX, {
+      message: "La contraseña no cumple con los requisitos",
+    }),
+  confirmNewPassword: z
+    .string()
+    .min(1, {
+      message: "La confirmación de la contraseña es requerida",
+    })
+    .regex(PASSWORD_VALIDATION_REGEX, {
+      message: "Las confirmación de la contraseña no cumple con los requisitos",
+    }),
 });
