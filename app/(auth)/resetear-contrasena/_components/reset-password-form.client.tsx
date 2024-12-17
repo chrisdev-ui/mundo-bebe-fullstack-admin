@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { PasswordInput } from "@/components/ui/password-input";
-import { PASSWORD_VALIDATION_REGEX } from "@/constants";
+import { AuthPaths, PASSWORD_VALIDATION_REGEX } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
 import { trpc } from "@/server/client";
 
@@ -46,7 +46,7 @@ const formSchema = z
   });
 
 export const ResetPasswordForm: React.FC = () => {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const { toast } = useToast();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -70,7 +70,7 @@ export const ResetPasswordForm: React.FC = () => {
         description: "Contraseña cambiada exitosamente",
         variant: "success",
       });
-      router.push("/iniciar-sesion");
+      router.push(AuthPaths.LOGIN);
     },
     onError: (error) => {
       toast({
@@ -90,7 +90,7 @@ export const ResetPasswordForm: React.FC = () => {
 
   useEffect(() => {
     if (!token || !email) {
-      router.push("/iniciar-sesion");
+      router.push(AuthPaths.LOGIN);
     }
   }, [router, token, email]);
 
@@ -141,7 +141,7 @@ export const ResetPasswordForm: React.FC = () => {
             Ha ocurrido un error al restablecer la contraseña. Por favor,
             intenta generar un nuevo enlace aquí:
             <br />
-            <Link href="/recuperar-contrasena" className="underline">
+            <Link href={AuthPaths.FORGOT_PASSWORD} className="underline">
               Recuperar contraseña
             </Link>
           </div>

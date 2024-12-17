@@ -1,32 +1,57 @@
 import type { NextAuthConfig } from "next-auth";
+import { getToken } from "next-auth/jwt";
+
+import { AuthPaths, PublicPaths } from "./constants";
+import {
+  isAdminPath,
+  isAuthFlowPath,
+  isNextPath,
+  isProtectedPath,
+  isPublicPath,
+} from "./lib/utils";
+import { UserRole } from "./types";
 
 export const authConfig = {
   pages: {
-    signIn: "/iniciar-sesion",
+    signIn: AuthPaths.LOGIN,
   },
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
+    async authorized({ request }) {
+      const { nextUrl } = request;
+      const session = await getToken({
+        req: request,
+        secret: process.env.AUTH_SECRET,
+      });
 
-      const isAdminRoute = nextUrl.pathname.startsWith("/admin");
+      const isLoggedIn = !!session?.user;
+      const isAdminRoute = isAdminPath(nextUrl.pathname);
+      const isAuthRoute = isAuthFlowPath(nextUrl.pathname);
+      const isPublicRoute = isPublicPath(nextUrl.pathname);
+      const isProtectedRoute = isProtectedPath(nextUrl.pathname);
+      const isNextRoute = isNextPath(nextUrl.pathname);
+      const needsAuthentication = isAuthRoute || isProtectedRoute;
 
-      const isAuthFlow =
-        nextUrl.pathname.startsWith("/registrarse") ||
-        nextUrl.pathname.startsWith("/recuperar-contrasena") ||
-        nextUrl.pathname.startsWith("/resetear-contrasena") ||
-        nextUrl.pathname.startsWith("/iniciar-sesion");
-
-      if (isAuthFlow && isLoggedIn) {
-        return Response.redirect(new URL("/", nextUrl));
-      }
-
-      if (isAdminRoute && isLoggedIn) {
+      if (isNextRoute || isPublicRoute) {
         return true;
       }
 
-      if (isAdminRoute && !isLoggedIn) {
+      if (needsAuthentication && !isLoggedIn) {
         return false;
+      }
+
+      if (isAuthRoute && isLoggedIn) {
+        return Response.redirect(new URL(PublicPaths.HOME, nextUrl));
+      }
+
+      if (isAdminRoute && isLoggedIn) {
+        if (
+          session.user?.role === UserRole.SUPER_ADMIN ||
+          session.user?.role === UserRole.ADMIN
+        ) {
+          return true;
+        }
+        return Response.redirect(new URL(PublicPaths.HOME, nextUrl));
       }
 
       return isLoggedIn;

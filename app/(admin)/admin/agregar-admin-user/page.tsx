@@ -1,14 +1,10 @@
-import { AuthContainer } from "@/components/layout/auth-container.server";
+import { AdminPaths } from "@/constants";
 import { checkModuleAccess } from "@/lib/auth";
 import { AccessModules } from "@/types";
-import { InviteAdminCard } from "./_components/invite-admin-card.server";
+import { InviteAdminPage } from "./_components/invite-admin-page.server";
 
 const AccessModule: AccessModules = "super-admin";
-export default async function InviteAdminPage() {
-  await checkModuleAccess(AccessModule, "admin/panel");
-  return (
-    <AuthContainer>
-      <InviteAdminCard />
-    </AuthContainer>
-  );
+export default async function AddNewAdminPage() {
+  await checkModuleAccess(AccessModule, AdminPaths.ADMIN_PANEL);
+  return <InviteAdminPage />;
 }

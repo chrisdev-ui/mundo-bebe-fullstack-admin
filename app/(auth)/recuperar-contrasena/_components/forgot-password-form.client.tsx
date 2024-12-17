@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AuthPaths } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
 import { trpc } from "@/server/client";
 
@@ -96,7 +97,7 @@ export const ForgotPasswordForm: React.FC = () => {
         </LoadingButton>
         <div className="mt-4 text-center text-sm">
           ¿Recordaste tu contraseña?{" "}
-          <Link href="/iniciar-sesion" className="underline">
+          <Link href={AuthPaths.LOGIN} className="underline">
             Iniciar sesión
           </Link>
         </div>

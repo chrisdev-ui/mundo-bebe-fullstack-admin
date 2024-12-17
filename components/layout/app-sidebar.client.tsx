@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   IconBell,
@@ -10,6 +9,7 @@ import {
   IconSelector,
 } from "@tabler/icons-react";
 import { useSession } from "next-auth/react";
+import { Link } from "next-view-transitions";
 
 import { Breadcrumbs } from "@/components/breadcrumbs.client";
 import { Icons } from "@/components/icons";
@@ -53,7 +53,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Company, navItems } from "@/constants";
-import { filterNavItems } from "@/lib/utils";
+import { logout } from "@/lib/actions";
+import { cn, filterNavItems } from "@/lib/utils";
 import { UserRole } from "@/types";
 
 export const AppSidebar: React.FC<{
@@ -115,18 +116,40 @@ export const AppSidebar: React.FC<{
                           </CollapsibleTrigger>
                           <CollapsibleContent>
                             <SidebarMenuSub>
-                              {item.items.map((subItem) => (
-                                <SidebarMenuSubItem key={subItem.title}>
-                                  <SidebarMenuSubButton
-                                    asChild
-                                    isActive={pathname === subItem.url}
-                                  >
-                                    <Link href={subItem.url}>
-                                      <span>{subItem.title}</span>
-                                    </Link>
-                                  </SidebarMenuSubButton>
-                                </SidebarMenuSubItem>
-                              ))}
+                              {item.items.map((subItem) => {
+                                const Icon = subItem.icon
+                                  ? Icons[subItem.icon]
+                                  : Icons.item;
+                                return (
+                                  <SidebarMenuSubItem key={subItem.title}>
+                                    <SidebarMenuSubButton
+                                      asChild={!!subItem.url}
+                                      isActive={pathname === subItem.url}
+                                      className={cn({
+                                        "cursor-pointer":
+                                          subItem.action != null,
+                                      })}
+                                      onClick={
+                                        subItem.action === "logout"
+                                          ? async () => await logout()
+                                          : undefined
+                                      }
+                                    >
+                                      {subItem?.url ? (
+                                        <Link href={subItem.url}>
+                                          {subItem.icon && <Icon />}
+                                          <span>{subItem.title}</span>
+                                        </Link>
+                                      ) : (
+                                        <>
+                                          {subItem.icon && <Icon />}
+                                          <span>{subItem.title}</span>
+                                        </>
+                                      )}
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                );
+                              })}
                             </SidebarMenuSub>
                           </CollapsibleContent>
                         </SidebarMenuItem>
@@ -134,14 +157,26 @@ export const AppSidebar: React.FC<{
                     ) : (
                       <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton
-                          asChild
+                          asChild={!!item.url}
                           tooltip={item.title}
                           isActive={pathname === item.url}
+                          onClick={
+                            item.action === "logout"
+                              ? async () => await logout()
+                              : undefined
+                          }
                         >
-                          <Link href={item.url}>
-                            <Icon />
-                            <span>{item.title}</span>
-                          </Link>
+                          {item.url ? (
+                            <Link href={item.url}>
+                              <Icon />
+                              <span>{item.title}</span>
+                            </Link>
+                          ) : (
+                            <>
+                              <Icon />
+                              <span>{item.title}</span>
+                            </>
+                          )}
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     );
@@ -249,7 +284,7 @@ export const AppSidebar: React.FC<{
       </Sidebar>
       <SidebarInset>
         <header className="group flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
+          <div className="flex flex-grow items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumbs />

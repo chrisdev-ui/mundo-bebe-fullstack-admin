@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -23,6 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
+import { AuthPaths } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
 import { authenticate } from "@/lib/actions";
 import { loginFormSchema as formSchema } from "@/types/schemas";
@@ -105,7 +106,7 @@ export const LoginForm: React.FC = () => {
           />
         </div>
         <Link
-          href="/recuperar-contrasena"
+          href={AuthPaths.FORGOT_PASSWORD}
           className="ml-auto w-max text-right text-sm underline"
         >
           ¿Olvidaste tu contraseña?
@@ -126,7 +127,7 @@ export const LoginForm: React.FC = () => {
         <InstagramSignInButton isPending={isPending} />
         <div className="mt-4 text-center text-sm">
           ¿No tienes una cuenta?{" "}
-          <Link href="/registrarse" className="underline">
+          <Link href={AuthPaths.SIGNUP} className="underline">
             Registrarse
           </Link>
         </div>

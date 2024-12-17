@@ -3,13 +3,14 @@
 import { AuthError } from "next-auth";
 
 import { signIn, signOut } from "@/auth";
+import { AuthPaths, PublicPaths } from "@/constants";
 import { loginFormSchema } from "@/types/schemas";
 
 export async function initActions(): Promise<void> {}
 
 export async function authenticate({
   data,
-  redirectTo = "/",
+  redirectTo = PublicPaths.HOME,
 }: {
   data: FormData;
   redirectTo?: string;
@@ -36,18 +37,18 @@ export async function authenticate({
 
 export async function loginWithGoogle(): Promise<void> {
   await signIn("google", {
-    redirectTo: "/",
+    redirectTo: PublicPaths.HOME,
   });
 }
 
 export async function loginWithInstagram(): Promise<void> {
   await signIn("instagram", {
-    redirectTo: "/",
+    redirectTo: PublicPaths.HOME,
   });
 }
 
 export async function logout(): Promise<void> {
   await signOut({
-    redirectTo: "/iniciar-sesion",
+    redirectTo: AuthPaths.LOGIN,
   });
 }

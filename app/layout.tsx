@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Baloo_2 as FontSans } from "next/font/google";
+import { ViewTransitions } from "next-view-transitions";
 
 import "@/styles/globals.css";
 
@@ -26,11 +27,13 @@ export default async function RootLayout({
 }>) {
   await initActions(); // dirty hack to avoid await top-level issue with server actions in Next.js
   return (
-    <html lang="es" className={cn(fontSans.variable)}>
-      <body className={cn("overflow-hidden")}>
-        <NextTopLoader color="#65C4BC" showSpinner={false} />
-        <TRPCProvider>{children}</TRPCProvider>
-      </body>
-    </html>
+    <ViewTransitions>
+      <html lang="es" className={cn(fontSans.variable)}>
+        <body className={cn("overflow-hidden")}>
+          <NextTopLoader color="#65C4BC" showSpinner={false} />
+          <TRPCProvider>{children}</TRPCProvider>
+        </body>
+      </html>
+    </ViewTransitions>
   );
 }

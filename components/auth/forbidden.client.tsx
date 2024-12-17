@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
 
 import { Container } from "@/components/layout/container.server";
 
@@ -12,7 +12,7 @@ interface ForbiddenProps {
 export const Forbidden: React.FC<ForbiddenProps> = ({
   redirectTimeout = 5,
 }) => {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const [seconds, setSeconds] = useState<number>(redirectTimeout);
 
   useEffect(() => {

@@ -13,7 +13,8 @@ export enum UserRole {
 
 export interface NavItem {
   title: string;
-  url: string;
+  url?: string;
+  action?: "logout" | null;
   disabled?: boolean;
   external?: boolean;
   icon?: keyof typeof Icons;

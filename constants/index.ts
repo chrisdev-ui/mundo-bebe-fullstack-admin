@@ -30,6 +30,9 @@ export const Company = {
 
 export const routeMapping: RouteMap = {
   "/admin/panel": [{ title: "Panel de información", link: "/admin/panel" }],
+  "/admin/agregar-admin-user": [
+    { title: "Agregar administrador", link: "/admin/agregar-admin-user" },
+  ],
   // Add more custom route mappings here
 };
 
@@ -39,7 +42,15 @@ export const navItems: NavItem[] = [
     url: "/admin/panel",
     icon: "dashboard",
     isActive: false,
-    accessLevel: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+    accessLevel: [UserRole.ADMIN],
+    items: [],
+  },
+  {
+    title: "Agregar administrador",
+    url: "/admin/agregar-admin-user",
+    icon: "addAdmin",
+    isActive: false,
+    accessLevel: [UserRole.SUPER_ADMIN],
     items: [],
   },
   {
@@ -47,29 +58,50 @@ export const navItems: NavItem[] = [
     url: "#",
     icon: "user",
     isActive: false,
-    accessLevel: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+    accessLevel: [UserRole.ADMIN],
     items: [
       {
-        title: "Perfil",
-        url: "#",
-        icon: "user",
+        title: "Editar perfil",
+        url: "/admin/editar-perfil",
+        icon: "userEdit",
         isActive: false,
-        accessLevel: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+        accessLevel: [UserRole.ADMIN],
       },
       {
         title: "Cambiar contraseña",
-        url: "#",
-        icon: "trash",
+        url: "/admin/cambiar-contrasena",
+        icon: "password",
         isActive: false,
-        accessLevel: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+        accessLevel: [UserRole.ADMIN],
       },
       {
         title: "Cerrar sesión",
-        url: "#",
-        icon: "close",
+        action: "logout",
+        icon: "logout",
         isActive: false,
-        accessLevel: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+        accessLevel: [UserRole.ADMIN],
       },
     ],
   },
 ];
+
+export const NEXT_AUTH_PATHNAME = "/auth";
+export const UNDERSCORE_NEXT_PATHNAME = "/_next";
+
+export enum PublicPaths {
+  HOME = "/",
+}
+
+export enum ProtectedPaths {}
+
+export enum AdminPaths {
+  ADMIN_PANEL = "/admin/panel",
+  ADD_ADMIN_USER = "/admin/agregar-admin-user",
+}
+
+export enum AuthPaths {
+  LOGIN = "/iniciar-sesion",
+  SIGNUP = "/registrarse",
+  FORGOT_PASSWORD = "/recuperar-contrasena",
+  RESET_PASSWORD = "/resetear-contrasena",
+}

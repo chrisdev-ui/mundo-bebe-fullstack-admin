@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Link, useTransitionRouter } from "next-view-transitions";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
-import { PASSWORD_VALIDATION_REGEX } from "@/constants";
+import { AuthPaths, PASSWORD_VALIDATION_REGEX } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
 import { trpc } from "@/server/client";
 
@@ -72,7 +72,7 @@ const formSchema = z
   });
 
 export const RegisterForm: React.FC = () => {
-  const router = useRouter();
+  const router = useTransitionRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
@@ -96,7 +96,7 @@ export const RegisterForm: React.FC = () => {
         variant: "success",
         description: "Cuenta creada exitosamente",
       });
-      router.push("/iniciar-sesion");
+      router.push(AuthPaths.LOGIN);
     },
     onError: (error) => {
       toast({
@@ -234,7 +234,7 @@ export const RegisterForm: React.FC = () => {
         <InstagramSignInButton isPending={isLoading} />
         <div className="mt-4 text-center text-sm">
           ¿Ya tienes una cuenta?{" "}
-          <Link href="/iniciar-sesion" className="underline">
+          <Link href={AuthPaths.LOGIN} className="underline">
             Iniciar sesión
           </Link>
         </div>
