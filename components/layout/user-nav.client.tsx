@@ -34,7 +34,9 @@ export const UserNav: React.FC = () => {
                 src={session.user.image ?? ""}
                 alt={session.user.name ?? ""}
               />
-              <AvatarFallback>{session.user?.name?.[0]}</AvatarFallback>
+              <AvatarFallback>
+                {session?.user.name?.slice(0, 2)?.toUpperCase()}
+              </AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>

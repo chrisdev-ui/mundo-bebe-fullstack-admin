@@ -208,8 +208,7 @@ export const AppSidebar: React.FC<{
                           alt={`${session?.user.name} ${session?.user.lastName}`}
                         />
                         <AvatarFallback className="rounded-lg">
-                          {session?.user.name?.slice(0, 2)?.toUpperCase() ??
-                            "MB"}
+                          {session?.user.name?.slice(0, 2)?.toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">

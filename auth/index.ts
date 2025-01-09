@@ -30,7 +30,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, session, trigger }) {
+      if (trigger === "update") {
+        return {
+          ...token,
+          user: {
+            ...token.user,
+            ...session.user,
+          },
+        };
+      }
       if (user) {
         const userInfo = await getUserById(user.id as string);
         if (!userInfo) {

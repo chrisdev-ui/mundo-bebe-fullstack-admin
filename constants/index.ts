@@ -17,6 +17,16 @@ export const ADMIN_EMAILS = ["web.christian.dev@gmail.com"];
 
 export const PASSWORD_CHANGE_COOLDOWN_MINUTES = 60;
 
+export const MAX_FILE_SIZE = 1024 * 1024 * 4.5;
+
+export const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+];
+
 export const MODULES = ["admin", "super-admin", "user", "guest"] as const;
 
 export const Company = {
