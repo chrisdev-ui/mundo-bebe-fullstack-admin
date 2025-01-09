@@ -59,6 +59,7 @@ export const EditarPerfilForm: React.FC = () => {
         handleUploadUrl: "/api/avatar/upload",
       });
     }
+    console.log("BLOB UPLOADED: ", blob);
   };
 
   useEffect(() => {
