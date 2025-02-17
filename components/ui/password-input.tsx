@@ -27,8 +27,7 @@ const PasswordInput = forwardRef<
 
   useImperativeHandle(ref, () => innerRef.current!);
 
-  const disabled =
-    props.value === "" || props.value === undefined || props.disabled;
+  const disabled = props.disabled;
 
   const checkStrength = useCallback(() => {
     const password = innerRef.current?.value ?? "";
@@ -99,7 +98,9 @@ const PasswordInput = forwardRef<
           aria-controls="password"
           disabled={disabled}
         >
-          {showPassword && !disabled ? (
+          {disabled || !props.value ? (
+            <IconEyeOff size={20} aria-hidden="true" />
+          ) : showPassword ? (
             <IconEye size={20} aria-hidden="true" />
           ) : (
             <IconEyeOff size={20} aria-hidden="true" />
@@ -109,7 +110,7 @@ const PasswordInput = forwardRef<
           </span>
         </Button>
       </div>
-      {showStrengthIndicator && (isFocused || innerRef.current?.value) && (
+      {showStrengthIndicator && (isFocused || props.value) && (
         <div className="animate-fade-down space-y-2 animate-once">
           <Progress
             value={(getStrengthScore() / checkStrength().length) * 100}

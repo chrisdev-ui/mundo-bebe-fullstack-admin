@@ -1,6 +1,17 @@
 import { IconBuildingStore } from "@tabler/icons-react";
+import {
+  addDays,
+  addMonths,
+  addWeeks,
+  endOfDay,
+  endOfMonth,
+  endOfWeek,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+} from "date-fns";
 
-import { NavItem, RouteMap, UserRole } from "@/types";
+import { CustomDate, NavItem, RouteMap, UserRole } from "@/types";
 
 export const PASSWORD_VALIDATION_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -26,6 +37,13 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
   "image/gif",
 ];
+
+export const roleMappings: Record<UserRole, string> = {
+  ADMIN: "Administrador",
+  USER: "Usuario",
+  GUEST: "Invitado",
+  SUPER_ADMIN: "Super Administrador",
+};
 
 export const MODULES = ["admin", "super-admin", "user", "guest"] as const;
 
@@ -64,6 +82,14 @@ export const navItems: NavItem[] = [
     items: [],
   },
   {
+    title: "Gestionar usuarios",
+    url: "/admin/gestionar-usuarios",
+    icon: "usersGroup",
+    isActive: false,
+    accessLevel: [UserRole.ADMIN],
+    items: [],
+  },
+  {
     title: "Cuenta",
     url: "#",
     icon: "user",
@@ -81,6 +107,13 @@ export const navItems: NavItem[] = [
         title: "Cambiar contraseña",
         url: "/admin/cambiar-contrasena",
         icon: "password",
+        isActive: false,
+        accessLevel: [UserRole.ADMIN],
+      },
+      {
+        title: "Privacidad",
+        url: "/admin/privacidad",
+        icon: "privacy",
         isActive: false,
         accessLevel: [UserRole.ADMIN],
       },
@@ -115,3 +148,32 @@ export enum AuthPaths {
   FORGOT_PASSWORD = "/recuperar-contrasena",
   RESET_PASSWORD = "/resetear-contrasena",
 }
+
+export const datePresets: Array<CustomDate> = [
+  { name: "Hoy", from: startOfDay(new Date()), to: endOfDay(new Date()) },
+  {
+    name: "Mañana",
+    from: startOfDay(addDays(new Date(), 1)),
+    to: endOfDay(addDays(new Date(), 1)),
+  },
+  {
+    name: "Esta semana",
+    from: startOfWeek(new Date()),
+    to: endOfWeek(new Date()),
+  },
+  {
+    name: "La próxima semana",
+    from: startOfWeek(addWeeks(new Date(), 1)),
+    to: endOfWeek(addWeeks(new Date(), 1)),
+  },
+  {
+    name: "Este mes",
+    from: startOfMonth(new Date()),
+    to: endOfMonth(new Date()),
+  },
+  {
+    name: "El próximo mes",
+    from: startOfMonth(addMonths(new Date(), 1)),
+    to: endOfMonth(addMonths(new Date(), 1)),
+  },
+];

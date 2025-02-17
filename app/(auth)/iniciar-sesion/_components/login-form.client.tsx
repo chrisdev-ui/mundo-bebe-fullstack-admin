@@ -54,7 +54,7 @@ export const LoginForm: React.FC = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "web.christian.dev@gmail.com",
-      password: "KtmN$Pqx128",
+      password: "KtmN$Pqx1",
     },
   });
 

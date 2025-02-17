@@ -3,6 +3,7 @@ import {
   AnyPgColumn,
   boolean,
   integer,
+  pgEnum,
   pgTable,
   primaryKey,
   text,
@@ -12,9 +13,18 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
+import { UserRole } from "@/types";
+
 export function lower(email: AnyPgColumn): SQL {
   return sql`lower(${email})`;
 }
+
+export const userRoleEnum = pgEnum("user_role", [
+  UserRole.USER,
+  UserRole.GUEST,
+  UserRole.ADMIN,
+  UserRole.SUPER_ADMIN,
+]);
 
 export const users = pgTable(
   "user",
@@ -26,10 +36,7 @@ export const users = pgTable(
     password: text("password"),
     email: text("email").unique(),
     emailVerified: timestamp("emailVerified", { mode: "date" }),
-    role: text("role")
-      .$type<"USER" | "ADMIN" | "SUPER_ADMIN" | "GUEST">()
-      .notNull()
-      .default("USER"),
+    role: userRoleEnum("role").notNull().default(UserRole.USER),
     image: text("image"),
     phoneNumber: text("phone_number"),
     dob: timestamp("dob", { mode: "date" }),

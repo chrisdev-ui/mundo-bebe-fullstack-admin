@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import ResetPasswordEmail from "@/components/emails/reset-password-email";
 import WelcomeEmail from "@/components/emails/welcome-email";
+import { UserRole } from "@/types";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
 
@@ -12,7 +13,9 @@ export const DeliverEmailSchema = z
   .discriminatedUnion("templateName", [
     z.object({
       templateName: z.literal("welcome"),
-      role: z.enum(["USER", "ADMIN", "SUPER_ADMIN"]).optional(),
+      role: z
+        .enum([UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN])
+        .optional(),
       name: z.string().optional(),
       webUrl: z.string().optional(),
     }),

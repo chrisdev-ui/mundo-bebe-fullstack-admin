@@ -26,6 +26,7 @@ import { Separator } from "@/components/ui/separator";
 import { AuthPaths, PASSWORD_VALIDATION_REGEX } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
 import { trpc } from "@/server/client";
+import { UserRole } from "@/types";
 
 const formSchema = z
   .object({
@@ -64,7 +65,7 @@ const formSchema = z
       .regex(PASSWORD_VALIDATION_REGEX, {
         message: "La contraseña no cumple con los requisitos",
       }),
-    role: z.enum(["USER", "ADMIN", "GUEST"]).default("USER"),
+    role: z.nativeEnum(UserRole).default(UserRole.USER),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
@@ -114,7 +115,7 @@ export const RegisterForm: React.FC = () => {
       email: email ?? "",
       password: "",
       confirmPassword: "",
-      role: "USER",
+      role: UserRole.USER,
     },
   });
 
@@ -127,7 +128,10 @@ export const RegisterForm: React.FC = () => {
       });
       return;
     }
-    createUser({ ...values, role: isValidCode ? "ADMIN" : "USER" });
+    createUser({
+      ...values,
+      role: isValidCode ? UserRole.ADMIN : UserRole.USER,
+    });
   };
 
   useEffect(() => {

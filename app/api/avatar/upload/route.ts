@@ -12,7 +12,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const jsonResponse = await handleUpload({
       body,
       request,
-      onBeforeGenerateToken: async (pathname, clientPayload) => {
+      onBeforeGenerateToken: async (pathname) => {
         const session = await auth();
         if (!session?.user) {
           throw new Error("No se encontró el usuario en la sesión");
@@ -25,7 +25,7 @@ export async function POST(request: Request): Promise<NextResponse> {
           }),
         };
       },
-      onUploadCompleted: async ({ blob, tokenPayload }) => {
+      onUploadCompleted: async ({ tokenPayload }) => {
         const { userId }: { userId: string } = JSON.parse(tokenPayload!);
         const user = await getUserById(userId);
         try {

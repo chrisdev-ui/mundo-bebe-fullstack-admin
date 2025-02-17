@@ -1,4 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
+import { format, Locale } from "date-fns";
+import { es } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 
 import {
@@ -57,4 +59,36 @@ export function isAdminPath(path: string): boolean {
   const adminPaths = [...Object.values(AdminPaths)].join("|");
   const pathRegexp = new RegExp(`^(?:${adminPaths})`, "g");
   return path.match(pathRegexp) !== null;
+}
+
+export function formatCaption(
+  date: Date,
+  options:
+    | {
+        locale?: Locale;
+      }
+    | undefined,
+) {
+  return format(date, "MMMM yyyy", { locale: es });
+}
+
+export function formatMonthCaption(
+  date: Date,
+  options:
+    | {
+        locale?: Locale;
+      }
+    | undefined,
+) {
+  return format(date, "MMMM", { locale: es }).replace(/^\w/, (c) =>
+    c.toUpperCase(),
+  );
+}
+
+export function isValidUserRole(role: string): boolean {
+  return Object.values(UserRole).includes(role as UserRole);
+}
+
+export function isAdminUser(role: UserRole) {
+  return role === UserRole.ADMIN || role === UserRole.SUPER_ADMIN;
 }

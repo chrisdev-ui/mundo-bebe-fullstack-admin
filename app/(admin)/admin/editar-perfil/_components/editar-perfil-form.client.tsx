@@ -10,9 +10,11 @@ import { z } from "zod";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LoadingButton } from "@/components/ui/button";
+import { DatePicker } from "@/components/ui/date-picker";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -20,7 +22,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { roleMappings } from "@/constants";
 import { useToast } from "@/hooks/use-toast";
+import { trpc } from "@/server/client";
+import { UserRole } from "@/types";
 import { editProfileSchema as formSchema } from "@/types/schemas";
 
 export const EditarPerfilForm: React.FC = () => {
@@ -28,11 +33,13 @@ export const EditarPerfilForm: React.FC = () => {
   const { toast } = useToast();
   const {
     data: session,
-    update,
+    update: updateSession,
     status,
   } = useSession({
     required: true,
   });
+
+  const { mutate: updateUser, isPending } = trpc.users.update.useMutation();
 
   const defaultValues = useMemo(
     () => ({
@@ -42,6 +49,8 @@ export const EditarPerfilForm: React.FC = () => {
       username: session?.user.username ?? "",
       email: session?.user.email ?? "",
       phoneNumber: session?.user.phoneNumber ?? "",
+      dob: session?.user?.dob ?? undefined,
+      role: (session?.user?.role as UserRole) ?? UserRole.USER,
     }),
     [session],
   );
@@ -53,13 +62,59 @@ export const EditarPerfilForm: React.FC = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     let blob: PutBlobResult | null = null;
-    if (values.avatar instanceof File) {
-      blob = await upload(values.avatar.name, values.avatar, {
-        access: "public",
-        handleUploadUrl: "/api/avatar/upload",
+    try {
+      if (values.avatar instanceof File) {
+        blob = await upload(values.avatar.name, values.avatar, {
+          access: "public",
+          handleUploadUrl: "/api/avatar/upload",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        description: "Error al subir la imagen. Por favor, inténtalo de nuevo.",
+        variant: "destructive",
       });
     }
-    console.log("BLOB UPLOADED: ", blob);
+    updateUser(
+      {
+        name: values.name,
+        lastName: values.lastName,
+        username: values.username,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        dob: values.dob,
+        image: blob?.url,
+      },
+      {
+        onSuccess: async (result) => {
+          if (result?.isSuccess) {
+            updateSession({
+              user: {
+                name: values.name,
+                lastName: values.lastName,
+                username: values.username,
+                email: values.email,
+                phoneNumber: values.phoneNumber,
+                dob: values.dob,
+                image: blob?.url,
+              },
+            });
+            toast({
+              description: result.message,
+              variant: "success",
+            });
+          }
+        },
+        onError: async (error) => {
+          console.error(error);
+          toast({
+            variant: "destructive",
+            description: error.message,
+          });
+        },
+      },
+    );
   };
 
   useEffect(() => {
@@ -73,6 +128,7 @@ export const EditarPerfilForm: React.FC = () => {
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex w-full flex-col space-y-8"
+        aria-busy={isPending}
       >
         <div className="grid place-items-center">
           <FormField
@@ -125,7 +181,10 @@ export const EditarPerfilForm: React.FC = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
-                <Input {...field} placeholder="Nombre" />
+                <FormControl>
+                  <Input {...field} placeholder="Nombre" />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -135,7 +194,10 @@ export const EditarPerfilForm: React.FC = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Apellido</FormLabel>
-                <Input {...field} placeholder="Apellido" />
+                <FormControl>
+                  <Input {...field} placeholder="Apellido" />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -145,7 +207,10 @@ export const EditarPerfilForm: React.FC = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Nombre de usuario</FormLabel>
-                <Input {...field} placeholder="Nombre de usuario" />
+                <FormControl>
+                  <Input {...field} placeholder="Nombre de usuario" />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -155,7 +220,10 @@ export const EditarPerfilForm: React.FC = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Correo electrónico</FormLabel>
-                <Input {...field} placeholder="Correo electrónico" />
+                <FormControl>
+                  <Input {...field} placeholder="Correo electrónico" />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -165,17 +233,68 @@ export const EditarPerfilForm: React.FC = () => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Número de teléfono</FormLabel>
-                <PhoneInput
-                  defaultCountry="CO"
-                  international={false}
-                  placeholder="Escribe tu número de teléfono"
-                  {...field}
-                />
+                <FormControl>
+                  <PhoneInput
+                    defaultCountry="CO"
+                    international={false}
+                    placeholder="Escribe tu número de teléfono"
+                    {...field}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dob"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fecha de nacimiento</FormLabel>
+                <FormControl>
+                  <DatePicker
+                    className="w-full"
+                    name={field.name}
+                    control={form.control}
+                    showOptions={false}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Rol</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    value={roleMappings[field.value] || field.value}
+                    disabled
+                    placeholder="Rol del usuario"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Puedes cambiar tu rol en la sección de{" "}
+                  <strong>Administración</strong>.
+                </FormDescription>
+                <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <LoadingButton loadingStates={[]} type="submit" className="">
+        <LoadingButton
+          loadingStates={[
+            {
+              isLoading: form.formState.isSubmitting || isPending,
+              text: "Actualizando perfil",
+            },
+          ]}
+          type="submit"
+          className=""
+        >
           Actualizar perfil
         </LoadingButton>
       </form>

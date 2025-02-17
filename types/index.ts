@@ -71,3 +71,9 @@ export type LoadingState = {
 };
 
 export type AccessModules = (typeof MODULES)[number];
+
+export interface CustomDate {
+  name: string;
+  from: Date;
+  to: Date;
+}

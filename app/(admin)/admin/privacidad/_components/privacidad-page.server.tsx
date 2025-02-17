@@ -1,18 +1,18 @@
 import { AdminPageHeader } from "@/components/admin-page-header.server";
 import { PageContainer } from "@/components/layout/page-container.server";
 import { Separator } from "@/components/ui/separator";
-import { CambiarContrasenaForm } from "./cambiar-contrasena-form.client";
+import { PrivacidadForm } from "./privacidad-form.client";
 
-export const CambiarContrasenaPage: React.FC = () => {
+export const PrivacidadPage: React.FC = () => {
   return (
     <PageContainer>
       <div className="space-y-4">
         <AdminPageHeader
-          title="Cambiar contraseña"
-          description="En esta página podrás actualizar la contraseña de tu cuenta."
+          title="Privacidad"
+          description="Gestiona la privacidad de tu cuenta y datos personales."
         />
         <Separator />
-        <CambiarContrasenaForm />
+        <PrivacidadForm />
       </div>
     </PageContainer>
   );

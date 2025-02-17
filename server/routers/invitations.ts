@@ -1,9 +1,14 @@
-import { TRPCError } from "@trpc/server";
-
+import { SUCCESS_MESSAGES } from "@/constants/errors";
 import { invites } from "@/db/schema";
 import { sendEmail } from "@/lib/sendgrid";
+import {
+  createSuccessResponse,
+  handleError,
+  throwTRPCError,
+} from "@/lib/utils.api";
 import { adminInvitationSchema, searchCodeSchema } from "@/server/schemas";
 import { protectedProcedure, publicProcedure, router } from "@/server/trpc";
+import { UserRole } from "@/types";
 
 const path = "/invitations";
 
@@ -24,10 +29,12 @@ export const invitationsRouter = router({
         });
         return !!isActiveInvitation;
       } catch (error) {
-        console.error(error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al buscar la invitación",
+        handleError(error, "OPERATION_FAILED", {
+          cause: error,
+          context: {
+            userId: ctx?.session?.user?.id,
+            operation: "getInvitation",
+          },
         });
       }
     }),
@@ -37,16 +44,16 @@ export const invitationsRouter = router({
     .mutation(async ({ input, ctx }) => {
       const parsedInput = adminInvitationSchema.safeParse(input);
       if (!parsedInput.success) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Ha ocurrido un error con los datos del formulario",
-          cause: parsedInput.error.issues.map((err) => err.message).join(", "),
+        throwTRPCError("INVALID_INPUT", undefined, {
+          validationErrors: parsedInput.error.issues.map((err) => err.message),
+          operation: "createInvitation",
+          userId: ctx?.session?.user?.id,
         });
       }
-      if (ctx.session.user.role !== "SUPER_ADMIN") {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "No tienes permisos para crear invitaciones",
+      if (ctx.session.user.role !== UserRole.SUPER_ADMIN) {
+        throwTRPCError("UNAUTHORIZED", undefined, {
+          userId: ctx?.session?.user?.id,
+          operation: "createInvitation",
         });
       }
       try {
@@ -55,9 +62,9 @@ export const invitationsRouter = router({
         });
 
         if (existingUser) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Este correo electrónico ya está registrado como usuario",
+          throwTRPCError("USER_EXISTS", undefined, {
+            userId: input.email,
+            operation: "createInvitation",
           });
         }
 
@@ -70,9 +77,9 @@ export const invitationsRouter = router({
         });
 
         if (userHasActiveInvitation) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "Este usuario ya tiene una invitación activa",
+          throwTRPCError("INVITATION_ALREADY_ACTIVE", undefined, {
+            userId: input.email,
+            operation: "createInvitation",
           });
         }
 
@@ -91,18 +98,19 @@ export const invitationsRouter = router({
             templateName: "welcome",
             to: input.email,
             name: input.name,
-            role: "ADMIN",
+            role: UserRole.ADMIN,
             webUrl: url,
           },
         });
+
+        return createSuccessResponse(SUCCESS_MESSAGES.INVITATION_SENT);
       } catch (e) {
-        if (e instanceof TRPCError) {
-          throw e;
-        }
-        console.error(e);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al enviar el correo",
+        handleError(e, "OPERATION_FAILED", {
+          cause: e,
+          context: {
+            userId: input.email,
+            operation: "createInvitation",
+          },
         });
       }
     }),

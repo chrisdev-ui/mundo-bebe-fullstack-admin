@@ -1,19 +1,29 @@
-import { TRPCError } from "@trpc/server";
-import { genSaltSync, hashSync } from "bcrypt-ts";
+import { compareSync, genSaltSync, hashSync } from "bcrypt-ts";
 import { differenceInMinutes, parseISO } from "date-fns";
 import { and, eq, SQL } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 
 import { PASSWORD_CHANGE_COOLDOWN_MINUTES } from "@/constants";
+import { SUCCESS_MESSAGES } from "@/constants/errors";
 import { users } from "@/db/schema";
 import { sendEmail } from "@/lib/sendgrid";
+import { isValidUserRole } from "@/lib/utils";
 import {
+  createSuccessResponse,
+  handleError,
+  throwTRPCError,
+} from "@/lib/utils.api";
+import {
+  changePasswordSchema,
   forgotPasswordSchema,
-  getUserSchema,
   resetPasswordSchema,
   userCreateSchema,
+  userDeleteSchema,
+  userReadSchema,
+  userUpdateSchema,
 } from "@/server/schemas";
 import { protectedProcedure, publicProcedure, router } from "@/server/trpc";
+import { UserRole } from "@/types";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 const RESET_TOKEN_EXPIRY = "1h";
@@ -23,18 +33,18 @@ const path = "/users";
 export const usersRouter = router({
   get: publicProcedure
     .meta({ openapi: { method: "GET", path } })
-    .input(getUserSchema)
+    .input(userReadSchema)
     .mutation(async ({ input, ctx }) => {
-      const parsedInput = getUserSchema.safeParse(input);
+      const parsedInput = userReadSchema.safeParse(input);
       if (!parsedInput.success) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Ha ocurrido un error con los datos del formulario",
-          cause: parsedInput.error.issues.map((err) => err.message).join(", "),
+        throwTRPCError("INVALID_INPUT", undefined, {
+          validationErrors: parsedInput.error.issues.map((err) => err.message),
+          operation: "getUser",
+          userId: ctx?.session?.user?.id,
         });
       }
       try {
-        const query = ctx.db.select({}).from(users);
+        const query = ctx.db.select().from(users);
         const wheres: (SQL | undefined)[] = [];
         if (input.name) {
           wheres.push(eq(users.name, input.name));
@@ -51,25 +61,29 @@ export const usersRouter = router({
         if (input.username) {
           wheres.push(eq(users.username, input.username));
         }
+        if (input.phoneNumber) {
+          wheres.push(eq(users.phoneNumber, input.phoneNumber));
+        }
+        if (input.dob) {
+          wheres.push(eq(users.dob, input.dob));
+        }
         if (wheres.length > 0) {
           query.where(and(...wheres));
         }
         const existUser = await query.execute();
         if (!existUser) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "No se encontró el usuario con los datos proporcionados",
-          });
+          throwTRPCError("USER_NOT_FOUND", undefined, { userId: input.id });
         }
-        return existUser;
+
+        return createSuccessResponse(SUCCESS_MESSAGES.USER_GET, existUser);
       } catch (error: any) {
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-        console.error(error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al buscar el usuario",
+        handleError(error, "OPERATION_FAILED", {
+          cause: error,
+          context: {
+            userId: input.id ?? ctx?.session?.user?.id,
+            operation: "getUser",
+          },
+          shouldLog: false,
         });
       }
     }),
@@ -79,44 +93,22 @@ export const usersRouter = router({
     .mutation(async ({ input, ctx }) => {
       const parsedInput = userCreateSchema.safeParse(input);
       if (!parsedInput.success) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Error parsing input",
-          cause: parsedInput.error.issues.map((err) => err.message).join(", "),
+        throwTRPCError("INVALID_INPUT", undefined, {
+          validationErrors: parsedInput.error.issues.map((err) => err.message),
+          operation: "createUser",
+          userId: ctx?.session?.user?.id,
         });
       }
-      if (!input.name || !input.lastName || !input.email || !input.password) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Todos los campos son requeridos",
-        });
-      }
+      if (!input.name || !input.lastName || !input.email || !input.password)
+        throwTRPCError("REQUIRED_FIELDS");
 
-      if (input.password !== input.confirmPassword) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Las contraseñas no coinciden",
-        });
-      }
+      if (input.password !== input.confirmPassword)
+        throwTRPCError("PASSWORD_MISMATCH");
 
-      if (input.password.length < 8 || input.password.length > 16) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "La contraseña debe tener entre 8 y 16 caracteres",
-        });
-      }
+      if (input.password.length < 8 || input.password.length > 16)
+        throwTRPCError("INVALID_PASSWORD_LENGTH");
 
-      if (
-        input.role !== "USER" &&
-        input.role !== "GUEST" &&
-        input.role !== "ADMIN" &&
-        input.role !== "SUPER_ADMIN"
-      ) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "El rol debe ser USER, GUEST, ADMIN o SUPER_ADMIN",
-        });
-      }
+      if (!isValidUserRole(input.role)) throwTRPCError("INVALID_ROLE");
 
       try {
         const salt = genSaltSync(10);
@@ -127,66 +119,190 @@ export const usersRouter = router({
         });
 
         if (existingUser) {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Este usuario ya existe",
+          throwTRPCError("USER_EXISTS", undefined, {
+            userId: existingUser.id,
+            email: existingUser.email,
+            operation: "createUser",
           });
         }
 
         await ctx.db.insert(users).values({
           name: input.name,
           lastName: input.lastName,
-          username: input.email,
+          username: input.username || input.email,
           password: hash,
           email: input.email,
           emailVerified: new Date(),
           role:
             process.env.SUPER_ADMIN_EMAIL === input.email
-              ? "SUPER_ADMIN"
+              ? UserRole.SUPER_ADMIN
               : input.role,
+          image: input.image,
+          phoneNumber: input.phoneNumber,
+          dob: input.dob ? new Date(input.dob) : null,
         });
+
+        return createSuccessResponse(SUCCESS_MESSAGES.USER_CREATED);
       } catch (e: any) {
-        if (e instanceof TRPCError) {
-          throw e;
-        }
-        console.error(e);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al crear el usuario",
+        handleError(e, "OPERATION_FAILED", {
+          context: {
+            cause: e,
+            userId: ctx?.session?.user?.id,
+            operation: "createUser",
+          },
         });
       }
     }),
   update: protectedProcedure
     .meta({ openapi: { method: "PUT", path } })
-    .input(userCreateSchema)
-    .mutation(async ({ input, ctx }) => {}),
+    .input(userUpdateSchema)
+    .mutation(async ({ input, ctx }) => {
+      const parsedInput = userUpdateSchema.safeParse(input);
+      if (!parsedInput.success)
+        throwTRPCError("INVALID_INPUT", undefined, {
+          validationErrors: parsedInput.error.issues.map((err) => err.message),
+          operation: "updateUser",
+          userId: ctx?.session?.user?.id,
+        });
+
+      try {
+        const existingUser = await ctx.db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.id, ctx.session.user.id),
+        });
+
+        if (!existingUser)
+          throwTRPCError("USER_NOT_FOUND", undefined, {
+            userId: ctx?.session?.user?.id,
+            operation: "updateUser",
+          });
+
+        await ctx.db
+          .update(users)
+          .set({
+            name: input.name,
+            lastName: input.lastName,
+            username: input.username,
+            email: input.email,
+            image: input.image,
+            phoneNumber: input.phoneNumber,
+            dob: input.dob,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, ctx.session.user.id));
+
+        return createSuccessResponse(SUCCESS_MESSAGES.PROFILE_UPDATED);
+      } catch (error: any) {
+        handleError(error, "OPERATION_FAILED", {
+          cause: error,
+          context: {
+            userId: ctx?.session?.user?.id,
+            operation: "updateUser",
+          },
+        });
+      }
+    }),
   delete: protectedProcedure
     .meta({ openapi: { method: "DELETE", path } })
-    .input(userCreateSchema)
-    .mutation(async ({ input, ctx }) => {}),
+    .input(userDeleteSchema)
+    .mutation(async ({ input, ctx }) => {
+      const parsedInput = userDeleteSchema.safeParse(input);
+      if (!parsedInput.success)
+        throwTRPCError("INVALID_INPUT", undefined, {
+          validationErrors: parsedInput.error.issues.map((err) => err.message),
+          operation: "deleteUser",
+          userId: ctx?.session?.user?.id,
+        });
+
+      try {
+        const userToDelete = await ctx.db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.id, input.id),
+        });
+
+        if (!userToDelete)
+          throwTRPCError("USER_NOT_FOUND", undefined, {
+            userId: input.id,
+            operation: "deleteUser",
+          });
+
+        const currentUser = ctx.session.user;
+
+        switch (currentUser.role) {
+          case UserRole.SUPER_ADMIN:
+            if (currentUser.id === userToDelete.id) {
+              throwTRPCError("SUPER_ADMIN_SELF_DELETE", undefined, {
+                userId: currentUser.id,
+                operation: "deleteUser",
+              });
+            }
+            break;
+
+          case UserRole.ADMIN:
+            if (
+              currentUser.id !== userToDelete.id &&
+              userToDelete.role !== UserRole.USER &&
+              userToDelete.role !== UserRole.GUEST
+            ) {
+              throwTRPCError("ADMIN_DELETE_UNAUTHORIZED", undefined, {
+                userId: currentUser.id,
+                targetUserId: userToDelete.id,
+                operation: "deleteUser",
+              });
+            }
+            break;
+
+          case UserRole.USER:
+          case UserRole.GUEST:
+            if (currentUser.id !== userToDelete.id) {
+              throwTRPCError("USER_DELETE_UNAUTHORIZED", undefined, {
+                userId: currentUser.id,
+                targetUserId: userToDelete.id,
+                operation: "deleteUser",
+              });
+            }
+            break;
+
+          default:
+            throwTRPCError("UNAUTHORIZED", undefined, {
+              userId: currentUser.id,
+              operation: "deleteUser",
+            });
+        }
+
+        await ctx.db.delete(users).where(eq(users.id, input.id));
+
+        return createSuccessResponse(SUCCESS_MESSAGES.USER_DELETED);
+      } catch (e: any) {
+        handleError(e, "OPERATION_FAILED", {
+          cause: e,
+          context: {
+            userId: ctx?.session?.user?.id,
+            operation: "deleteUser",
+          },
+        });
+      }
+    }),
   forgotPassword: publicProcedure
     .meta({ openapi: { method: "POST", path: `${path}/forgot-password` } })
     .input(forgotPasswordSchema)
     .mutation(async ({ input, ctx }) => {
       const parsedInput = forgotPasswordSchema.safeParse(input);
-      if (!parsedInput.success) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Ha ocurrido un error con los datos del formulario",
-          cause: parsedInput.error.issues.map((err) => err.message).join(", "),
+      if (!parsedInput.success)
+        throwTRPCError("INVALID_INPUT", undefined, {
+          validationErrors: parsedInput.error.issues.map((err) => err.message),
+          operation: "forgotPassword",
+          userId: ctx?.session?.user?.id,
         });
-      }
+
       try {
         const user = await ctx.db.query.users.findFirst({
           where: (users, { eq }) => eq(users.email, input.email),
         });
 
-        if (!user) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "No se encontró el usuario con el correo proporcionado",
+        if (!user)
+          throwTRPCError("USER_NOT_FOUND", undefined, {
+            userId: input.email,
+            operation: "forgotPassword",
           });
-        }
 
         const minutesSinceLastUpdate = differenceInMinutes(
           new Date(),
@@ -194,12 +310,14 @@ export const usersRouter = router({
         );
 
         if (minutesSinceLastUpdate < PASSWORD_CHANGE_COOLDOWN_MINUTES) {
-          const waitMinutes =
-            PASSWORD_CHANGE_COOLDOWN_MINUTES - minutesSinceLastUpdate;
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: `La contraseña no puede ser cambiada. Por favor espera ${waitMinutes} minutos antes de intentar nuevamente.`,
-          });
+          throwTRPCError(
+            "PASSWORD_CHANGE_COOLDOWN",
+            PASSWORD_CHANGE_COOLDOWN_MINUTES - minutesSinceLastUpdate,
+            {
+              userId: user.id,
+              operation: "forgotPassword",
+            },
+          );
         }
 
         const token = jwt.sign(
@@ -218,14 +336,15 @@ export const usersRouter = router({
             webUrl,
           },
         });
+
+        return createSuccessResponse(SUCCESS_MESSAGES.FORGOT_PASSWORD);
       } catch (error: any) {
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-        console.error(error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al intentar recuperar la contraseña",
+        handleError(error, "OPERATION_FAILED", {
+          cause: error,
+          context: {
+            userId: input.email,
+            operation: "forgotPassword",
+          },
         });
       }
     }),
@@ -234,20 +353,15 @@ export const usersRouter = router({
     .input(resetPasswordSchema)
     .mutation(async ({ input, ctx }) => {
       const parsedInput = resetPasswordSchema.safeParse(input);
-      if (!parsedInput.success) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Ha ocurrido un error con los datos del formulario",
-          cause: parsedInput.error.issues.map((err) => err.message).join(", "),
+      if (!parsedInput.success)
+        throwTRPCError("INVALID_INPUT", undefined, {
+          validationErrors: parsedInput.error.issues.map((err) => err.message),
+          operation: "resetPassword",
+          userId: ctx?.session?.user?.id,
         });
-      }
 
-      if (input.newPassword !== input.confirmNewPassword) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Las contraseñas no coinciden",
-        });
-      }
+      if (input.newPassword !== input.confirmNewPassword)
+        throwTRPCError("PASSWORD_MISMATCH");
 
       try {
         const decoded = jwt.verify(input.token, JWT_SECRET) as {
@@ -259,12 +373,11 @@ export const usersRouter = router({
           where: (users, { eq }) => eq(users.id, decoded.userId),
         });
 
-        if (!user) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "No se encontró el usuario con el token proporcionado",
+        if (!user)
+          throwTRPCError("JWT_USER_NOT_FOUND", undefined, {
+            userId: input.token,
+            operation: "resetPassword",
           });
-        }
 
         const minutesSinceLastUpdate = differenceInMinutes(
           new Date(),
@@ -272,12 +385,14 @@ export const usersRouter = router({
         );
 
         if (minutesSinceLastUpdate < PASSWORD_CHANGE_COOLDOWN_MINUTES) {
-          const waitMinutes =
-            PASSWORD_CHANGE_COOLDOWN_MINUTES - minutesSinceLastUpdate;
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: `La contraseña no puede ser cambiada. Por favor espera ${waitMinutes} minutos antes de intentar nuevamente.`,
-          });
+          throwTRPCError(
+            "PASSWORD_CHANGE_COOLDOWN",
+            PASSWORD_CHANGE_COOLDOWN_MINUTES - minutesSinceLastUpdate,
+            {
+              userId: user.id,
+              operation: "resetPassword",
+            },
+          );
         }
 
         const salt = genSaltSync(10);
@@ -287,20 +402,76 @@ export const usersRouter = router({
           .update(users)
           .set({ password: hash, updatedAt: new Date() })
           .where(eq(users.id, decoded.userId));
+
+        return createSuccessResponse(SUCCESS_MESSAGES.PASSWORD_CHANGED);
       } catch (error: any) {
-        if (error instanceof jwt.JsonWebTokenError) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "El token no es válido o ha caducado",
+        handleError(error, "OPERATION_FAILED", {
+          cause: error,
+          context: {
+            userId: input.token,
+            operation: "resetPassword",
+          },
+        });
+      }
+    }),
+  changePassword: protectedProcedure
+    .meta({ openapi: { method: "PATCH", path: `${path}/change-password` } })
+    .input(changePasswordSchema)
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const user = await ctx.db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.id, ctx.session.user.id),
+        });
+
+        if (!user)
+          throwTRPCError("USER_NOT_FOUND", undefined, {
+            userId: ctx?.session?.user?.id,
+            operation: "changePassword",
           });
-        }
-        if (error instanceof TRPCError) {
-          throw error;
-        }
-        console.error(error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Ha ocurrido un error al intentar cambiar la contraseña",
+
+        if (!user.password)
+          throwTRPCError("USER_NOT_ALLOWED_TO_CHANGE_PASSWORD", undefined, {
+            userId: ctx?.session?.user?.id,
+            operation: "changePassword",
+          });
+
+        const isValidPassword = compareSync(
+          input.currentPassword,
+          user.password,
+        );
+
+        if (!isValidPassword)
+          throwTRPCError("INVALID_PASSWORD", undefined, {
+            userId: ctx?.session?.user?.id,
+            operation: "changePassword",
+          });
+
+        const isSamePassword = compareSync(input.newPassword, user.password);
+        if (isSamePassword)
+          throwTRPCError("SAME_PASSWORD", undefined, {
+            userId: ctx?.session?.user?.id,
+            operation: "changePassword",
+          });
+
+        const salt = genSaltSync(10);
+        const hash = hashSync(input.newPassword, salt);
+
+        await ctx.db
+          .update(users)
+          .set({
+            password: hash,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, ctx.session.user.id));
+
+        return createSuccessResponse(SUCCESS_MESSAGES.PASSWORD_CHANGED);
+      } catch (error: any) {
+        handleError(error, "OPERATION_FAILED", {
+          cause: error,
+          context: {
+            userId: ctx?.session?.user?.id,
+            operation: "changePassword",
+          },
         });
       }
     }),
