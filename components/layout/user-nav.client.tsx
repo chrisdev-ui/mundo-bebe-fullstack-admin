@@ -14,8 +14,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { logout } from "@/lib/actions";
-import { Skeleton } from "../ui/skeleton";
 
 export const UserNav: React.FC = () => {
   const { data: session, status } = useSession();

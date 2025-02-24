@@ -28,21 +28,25 @@ import {
 import { cn, formatCaption, formatMonthCaption } from "@/lib/utils";
 
 interface DatePickerProps<T extends FieldValues> {
+  enablePointerEvents?: boolean;
   className?: string;
   readonly showOptions?: boolean;
   readonly placeholder?: string;
   readonly name: FieldPath<T>;
   readonly control: Control<T>;
   readonly disabled?: boolean;
+  readonly needFutureYears?: number;
 }
 
 export function DatePicker<T extends FieldValues>({
+  enablePointerEvents = false,
   className,
   placeholder,
-  showOptions = true,
+  showOptions = false,
   name,
   control,
   disabled = false,
+  needFutureYears = 100,
 }: DatePickerProps<T>) {
   const {
     field: { value, onChange },
@@ -55,7 +59,7 @@ export function DatePicker<T extends FieldValues>({
   };
 
   return (
-    <Popover>
+    <Popover modal={!!enablePointerEvents}>
       <PopoverTrigger asChild>
         <Button
           disabled={disabled}
@@ -71,10 +75,14 @@ export function DatePicker<T extends FieldValues>({
           ) : (
             <span>{placeholder}</span>
           )}
-          <CalendarDays className="h-4 w-4" />
+          <CalendarDays className="size-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="flex w-auto flex-col space-y-2 p-2">
+      <PopoverContent
+        className={cn("flex w-auto flex-col space-y-2 p-2", {
+          "pointer-events-auto": enablePointerEvents,
+        })}
+      >
         {showOptions ? (
           <Select
             onValueChange={(value) =>
@@ -94,21 +102,20 @@ export function DatePicker<T extends FieldValues>({
             </SelectContent>
           </Select>
         ) : null}
-        <div className="rounded-md border">
-          <Calendar
-            mode="single"
-            selected={value}
-            onSelect={handleSelect}
-            fromYear={currentYear - 100}
-            toYear={currentYear}
-            captionLayout="dropdown-buttons"
-            locale={es}
-            formatters={{
-              formatCaption,
-              formatMonthCaption,
-            }}
-          />
-        </div>
+        <Calendar
+          mode="single"
+          defaultMonth={value}
+          selected={value}
+          onSelect={handleSelect}
+          fromYear={currentYear - needFutureYears}
+          toYear={currentYear + needFutureYears}
+          captionLayout="dropdown-buttons"
+          locale={es}
+          formatters={{
+            formatCaption,
+            formatMonthCaption,
+          }}
+        />
       </PopoverContent>
     </Popover>
   );

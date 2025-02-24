@@ -29,6 +29,7 @@ interface DateRangePickerProps<T extends FieldValues>
   control: Control<T>;
   placeholder?: string;
   disabled?: boolean;
+  enablePointerEvents?: boolean;
 }
 
 const currentYear = new Date().getFullYear();
@@ -39,6 +40,7 @@ export function DateRangePicker<T extends FieldValues>({
   placeholder = "Selecciona un rango de fechas",
   name,
   control,
+  enablePointerEvents = false,
   ...props
 }: DateRangePickerProps<T>) {
   const [customDateSelected, setCustomDateselected] = useState<string>("");
@@ -62,11 +64,14 @@ export function DateRangePicker<T extends FieldValues>({
 
   return (
     <div className={cn("grid gap-2", className)} {...props}>
-      <Popover>
+      <Popover modal={!!enablePointerEvents}>
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
-            className={cn("justify-between bg-white px-3.5 py-2.5")}
+            className={cn(
+              "justify-between bg-white px-3.5 py-2.5",
+              !value && "text-muted-foreground",
+            )}
           >
             {value?.from ? (
               value.to ? (
@@ -80,10 +85,15 @@ export function DateRangePicker<T extends FieldValues>({
             ) : (
               <span>{placeholder}</span>
             )}
-            <CalendarDays className="h-4 w-4" />
+            <CalendarDays className="mr-2 size-4" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent
+          className={cn("w-auto p-0", {
+            "pointer-events-auto": enablePointerEvents,
+          })}
+          align="start"
+        >
           <div className="flex flex-row">
             <div className="flex max-h-[350px] flex-col overflow-y-auto">
               {customDates.map((customDate: CustomDate) => (
@@ -110,8 +120,8 @@ export function DateRangePicker<T extends FieldValues>({
               defaultMonth={value?.from}
               selected={value}
               onSelect={handleSelect}
-              fromYear={currentYear - 100}
-              toYear={currentYear}
+              fromYear={currentYear - 5}
+              toYear={currentYear + 5}
               captionLayout="dropdown-buttons"
               locale={es}
               formatters={{

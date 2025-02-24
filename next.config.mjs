@@ -1,9 +1,16 @@
+import { createJiti } from "jiti";
+import { fileURLToPath } from "node:url";
+const jiti = createJiti(fileURLToPath(import.meta.url));
+ 
+// Import env here to validate during build. Using jiti@^1 we can import .ts files :)
+await jiti.import("./env.ts");
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     experimental: {
         missingSuspenseWithCSRBailout: false,
         serverActions: {
-            allowedOrigins: ["localhost:3000","c5qxs3h3-3000.use2.devtunnels.ms", "*.c5qxs3h3-3000.use2.devtunnels.ms", "mundobebeja.com"]
+            allowedOrigins: ["localhost:3000", "mundobebeja.com"]
         }
     },
     images: {

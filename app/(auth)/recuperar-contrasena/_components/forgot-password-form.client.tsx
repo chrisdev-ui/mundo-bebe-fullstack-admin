@@ -1,8 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { LoadingButton } from "@/components/ui/button";
@@ -16,22 +18,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { AuthPaths } from "@/constants";
-import { useToast } from "@/hooks/use-toast";
-import { trpc } from "@/server/client";
-
-const formSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, {
-      message: "El correo electrónico es requerido",
-    })
-    .email({ message: "El correo electrónico es inválido" }),
-});
+import { SUCCESS_MESSAGES } from "@/constants/messages";
+import { forgotPassword } from "../_lib/actions";
+import { forgotPasswordSchema as formSchema } from "../_lib/validations";
 
 export const ForgotPasswordForm: React.FC = () => {
-  const { toast } = useToast();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,27 +30,19 @@ export const ForgotPasswordForm: React.FC = () => {
     },
   });
 
-  const { mutate: forgotPasswordSubmit, isPending } =
-    trpc.users.forgotPassword.useMutation({
-      onSuccess: () => {
-        toast({
-          description:
-            "Se ha enviado un correo con las instrucciones para recuperar tu contraseña",
-          variant: "success",
-        });
-        form.reset();
-      },
-      onError: (error) => {
-        toast({
-          variant: "destructive",
-          description: error.message,
-        });
-        form.reset();
-      },
-    });
+  const { mutate, isPending } = useMutation({
+    mutationFn: forgotPassword,
+    onSuccess: () => {
+      form.reset();
+      toast.info(SUCCESS_MESSAGES.FORGOT_PASSWORD);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    forgotPasswordSubmit(values);
+    mutate(values);
   };
 
   return (

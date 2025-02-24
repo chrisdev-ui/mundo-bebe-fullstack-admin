@@ -13,7 +13,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
-import { UserRole } from "@/types";
+import { UserRole } from "@/types/enum";
 
 export function lower(email: AnyPgColumn): SQL {
   return sql`lower(${email})`;
@@ -119,6 +119,9 @@ export const invites = pgTable("invitation", {
   id: uuid("id").primaryKey().defaultRandom().notNull(),
   email: text("email").notNull(),
   token: text("token").unique().notNull(),
+  used: boolean("used").notNull().default(false),
   expiresAt: timestamp("expires", { mode: "date" }).notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+export type User = typeof users.$inferSelect;

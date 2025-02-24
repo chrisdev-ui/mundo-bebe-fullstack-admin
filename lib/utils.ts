@@ -1,17 +1,12 @@
+import { genSaltSync, hashSync } from "bcrypt-ts";
 import { clsx, type ClassValue } from "clsx";
 import { format, Locale } from "date-fns";
 import { es } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 
-import {
-  AdminPaths,
-  AuthPaths,
-  NEXT_AUTH_PATHNAME,
-  ProtectedPaths,
-  PublicPaths,
-  UNDERSCORE_NEXT_PATHNAME,
-} from "@/constants";
-import { NavItem, UserRole } from "@/types";
+import { AdminPaths, AuthPaths, ProtectedPaths } from "@/constants";
+import { NavItem, type UserRole } from "@/types";
+import { UserRole as UserRoleEnum } from "@/types/enum";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -23,7 +18,8 @@ export function filterNavItems(
 ): NavItem[] {
   return items.filter((item) => {
     const hasAccess =
-      userRole === UserRole.SUPER_ADMIN || item.accessLevel.includes(userRole);
+      userRole === UserRoleEnum.SUPER_ADMIN ||
+      item.accessLevel.includes(userRole);
     if (hasAccess && item.items) {
       item.items = filterNavItems(item.items, userRole);
     }
@@ -31,16 +27,14 @@ export function filterNavItems(
   });
 }
 
-export function isNextPath(pathname: string): boolean {
-  const allowedPaths = [NEXT_AUTH_PATHNAME, UNDERSCORE_NEXT_PATHNAME].join("|");
-  const pathRegexp = new RegExp(`^(?:${allowedPaths})`, "g");
-  return pathname.match(pathRegexp) !== null;
-}
-
-export function isPublicPath(path: string): boolean {
-  const publicPaths = [...Object.values(PublicPaths)].join("|");
-  const pathRegexp = new RegExp(`^(?:${publicPaths})`, "g");
-  return path.match(pathRegexp) !== null;
+export function toSentenceCase(str: string) {
+  return str
+    .replace(/_/g, " ")
+    .replace(/([A-Z])/g, " $1")
+    .toLowerCase()
+    .replace(/^\w/, (c) => c.toUpperCase())
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export function isProtectedPath(path: string): boolean {
@@ -86,9 +80,14 @@ export function formatMonthCaption(
 }
 
 export function isValidUserRole(role: string): boolean {
-  return Object.values(UserRole).includes(role as UserRole);
+  return Object.values(UserRoleEnum).includes(role as UserRole);
 }
 
 export function isAdminUser(role: UserRole) {
-  return role === UserRole.ADMIN || role === UserRole.SUPER_ADMIN;
+  return role === UserRoleEnum.ADMIN || role === UserRoleEnum.SUPER_ADMIN;
+}
+
+export function generatePassword(password: string, length: number = 10) {
+  const salt = genSaltSync(length);
+  return hashSync(password, salt);
 }

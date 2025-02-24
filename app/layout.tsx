@@ -8,7 +8,7 @@ import NextTopLoader from "nextjs-toploader";
 
 import { initActions } from "@/lib/actions";
 import { cn } from "@/lib/utils";
-import { TRPCProvider } from "@/providers/trpc-provider";
+import { MainProvider } from "@/providers";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -31,7 +31,7 @@ export default async function RootLayout({
       <html lang="es" className={cn(fontSans.variable)}>
         <body className={cn("overflow-hidden")}>
           <NextTopLoader color="#65C4BC" showSpinner={false} />
-          <TRPCProvider>{children}</TRPCProvider>
+          <MainProvider>{children}</MainProvider>
         </body>
       </html>
     </ViewTransitions>

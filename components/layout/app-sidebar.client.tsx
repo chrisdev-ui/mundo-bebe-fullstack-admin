@@ -55,7 +55,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Company, navItems } from "@/constants";
 import { logout } from "@/lib/actions";
 import { cn, filterNavItems } from "@/lib/utils";
-import { UserRole } from "@/types";
+import type { UserRole } from "@/types";
 
 export const AppSidebar: React.FC<{
   children: React.ReactNode;

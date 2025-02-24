@@ -19,7 +19,7 @@
     --accent: 189 78% 91%; /* #D7F5FA */
     --accent-foreground: var(--foreground);
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
     --info: 188 78% 41%;
     --info-foreground: 0 0% 100%;
     --success: 134 61% 41%;

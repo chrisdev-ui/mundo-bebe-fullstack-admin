@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Link, useTransitionRouter } from "next-view-transitions";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { LoadingButton } from "@/components/ui/button";
@@ -17,38 +19,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { PasswordInput } from "@/components/ui/password-input";
-import { AuthPaths, PASSWORD_VALIDATION_REGEX } from "@/constants";
-import { useToast } from "@/hooks/use-toast";
-import { trpc } from "@/server/client";
-
-const formSchema = z
-  .object({
-    newPassword: z
-      .string()
-      .min(1, {
-        message: "La contraseña es requerida",
-      })
-      .regex(PASSWORD_VALIDATION_REGEX, {
-        message: "La contraseña es inválida",
-      }),
-    confirmPassword: z
-      .string()
-      .min(1, {
-        message: "La contraseña es requerida",
-      })
-      .regex(PASSWORD_VALIDATION_REGEX, {
-        message: "La contraseña es inválida",
-      }),
-  })
-  .refine((data) => data.newPassword === data.confirmPassword, {
-    message: "Las contraseñas no coinciden",
-    path: ["confirmPassword"],
-  });
+import { AuthPaths } from "@/constants";
+import { SUCCESS_MESSAGES } from "@/constants/messages";
+import { resetPassword } from "../_lib/actions";
+import { formSchema } from "../_lib/validations";
 
 export const ResetPasswordForm: React.FC = () => {
   const router = useTransitionRouter();
-  const { toast } = useToast();
   const searchParams = useSearchParams();
+
   const token = searchParams.get("token");
   const email = searchParams.get("email");
 
@@ -60,31 +39,24 @@ export const ResetPasswordForm: React.FC = () => {
     },
   });
 
-  const {
-    mutate: resetPasswordSubmit,
-    isPending,
-    isError,
-  } = trpc.users.resetPassword.useMutation({
+  const { mutate, isPending, isError } = useMutation({
+    mutationFn: resetPassword,
     onSuccess: () => {
-      toast({
-        description: "Contraseña cambiada exitosamente",
-        variant: "success",
-      });
+      toast.success(SUCCESS_MESSAGES.PASSWORD_CHANGED);
       router.push(AuthPaths.LOGIN);
     },
-    onError: (error) => {
-      toast({
-        variant: "destructive",
-        description: error.message,
-      });
+    onError: (error: Error) => {
+      toast.error(error.message);
     },
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
-    resetPasswordSubmit({
-      token: token as string,
+    if (!token) return;
+
+    mutate({
+      token,
       newPassword: values.newPassword,
-      confirmNewPassword: values.confirmPassword,
+      confirmPassword: values.confirmPassword,
     });
   };
 
@@ -105,7 +77,7 @@ export const ResetPasswordForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Nueva contraseña</FormLabel>
                 <FormControl>
-                  <PasswordInput disabled={isPending} {...field} />
+                  <PasswordInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,7 +90,7 @@ export const ResetPasswordForm: React.FC = () => {
               <FormItem>
                 <FormLabel>Confirmar nueva contraseña</FormLabel>
                 <FormControl>
-                  <PasswordInput disabled={isPending} {...field} />
+                  <PasswordInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,7 +101,7 @@ export const ResetPasswordForm: React.FC = () => {
           loadingStates={[
             {
               isLoading: isPending,
-              text: "Restableciendo contraseña",
+              text: "Restableciendo",
             },
           ]}
           type="submit"

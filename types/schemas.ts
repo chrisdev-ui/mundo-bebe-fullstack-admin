@@ -5,7 +5,7 @@ import {
   MAX_FILE_SIZE,
   PASSWORD_VALIDATION_REGEX,
 } from "@/constants";
-import { UserRole } from ".";
+import { UserRole } from "./enum";
 
 export const loginFormSchema = z.object({
   username: z.string().trim().min(1, {

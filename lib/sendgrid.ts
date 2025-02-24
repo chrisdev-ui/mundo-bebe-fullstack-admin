@@ -5,9 +5,10 @@ import { z } from "zod";
 
 import ResetPasswordEmail from "@/components/emails/reset-password-email";
 import WelcomeEmail from "@/components/emails/welcome-email";
-import { UserRole } from "@/types";
+import { env } from "@/env";
+import { UserRole } from "@/types/enum";
 
-sendgrid.setApiKey(process.env.SENDGRID_API_KEY!);
+sendgrid.setApiKey(env.SENDGRID_API_KEY);
 
 export const DeliverEmailSchema = z
   .discriminatedUnion("templateName", [

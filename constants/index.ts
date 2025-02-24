@@ -1,4 +1,13 @@
-import { IconBuildingStore } from "@tabler/icons-react";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
+import {
+  Icon,
+  IconBuildingStore,
+  IconCrown,
+  IconProps,
+  IconUser,
+  IconUserQuestion,
+  IconUserStar,
+} from "@tabler/icons-react";
 import {
   addDays,
   addMonths,
@@ -12,6 +21,9 @@ import {
 } from "date-fns";
 
 import { CustomDate, NavItem, RouteMap, UserRole } from "@/types";
+import { UserRole as UserRoleEnum } from "@/types/enum";
+
+export const databasePrefix = "mundobebe";
 
 export const PASSWORD_VALIDATION_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -45,7 +57,29 @@ export const roleMappings: Record<UserRole, string> = {
   SUPER_ADMIN: "Super Administrador",
 };
 
+export const roleIcons: Record<
+  UserRole,
+  ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>
+> = {
+  ADMIN: IconUserStar,
+  USER: IconUser,
+  GUEST: IconUserQuestion,
+  SUPER_ADMIN: IconCrown,
+};
+
+export const columnLabelMappings: Record<string, string> = {
+  image: "Foto de perfil",
+  name: "Nombre completo",
+  email: "Correo electrónico",
+  phoneNumber: "Teléfono",
+  role: "Rol",
+  dob: "Fecha de nacimiento",
+  createdAt: "Fecha de creación",
+};
+
 export const MODULES = ["admin", "super-admin", "user", "guest"] as const;
+
+export const PLACEHOLDER_IMAGE = "https://placehold.co/400";
 
 export const Company = {
   name: "Mundo Bebé",
@@ -70,7 +104,7 @@ export const navItems: NavItem[] = [
     url: "/admin/panel",
     icon: "dashboard",
     isActive: false,
-    accessLevel: [UserRole.ADMIN],
+    accessLevel: [UserRoleEnum.ADMIN],
     items: [],
   },
   {
@@ -78,7 +112,7 @@ export const navItems: NavItem[] = [
     url: "/admin/agregar-admin-user",
     icon: "addAdmin",
     isActive: false,
-    accessLevel: [UserRole.SUPER_ADMIN],
+    accessLevel: [UserRoleEnum.SUPER_ADMIN],
     items: [],
   },
   {
@@ -86,7 +120,7 @@ export const navItems: NavItem[] = [
     url: "/admin/gestionar-usuarios",
     icon: "usersGroup",
     isActive: false,
-    accessLevel: [UserRole.ADMIN],
+    accessLevel: [UserRoleEnum.ADMIN],
     items: [],
   },
   {
@@ -94,35 +128,35 @@ export const navItems: NavItem[] = [
     url: "#",
     icon: "user",
     isActive: false,
-    accessLevel: [UserRole.ADMIN],
+    accessLevel: [UserRoleEnum.ADMIN],
     items: [
       {
         title: "Editar perfil",
         url: "/admin/editar-perfil",
         icon: "userEdit",
         isActive: false,
-        accessLevel: [UserRole.ADMIN],
+        accessLevel: [UserRoleEnum.ADMIN],
       },
       {
         title: "Cambiar contraseña",
         url: "/admin/cambiar-contrasena",
         icon: "password",
         isActive: false,
-        accessLevel: [UserRole.ADMIN],
+        accessLevel: [UserRoleEnum.ADMIN],
       },
       {
         title: "Privacidad",
         url: "/admin/privacidad",
         icon: "privacy",
         isActive: false,
-        accessLevel: [UserRole.ADMIN],
+        accessLevel: [UserRoleEnum.ADMIN],
       },
       {
         title: "Cerrar sesión",
         action: "logout",
         icon: "logout",
         isActive: false,
-        accessLevel: [UserRole.ADMIN],
+        accessLevel: [UserRoleEnum.ADMIN],
       },
     ],
   },

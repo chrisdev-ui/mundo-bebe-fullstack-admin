@@ -36,8 +36,3 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
 ## Next Steps
-
-1. Finish the inivitation flow on trpc router.
-2. Finish the invitation flow on the client with form on admin route.
-3. In register route, check search param for invitation token and redirect to invitation route.
-4. Finish the invitation flow on the client with form on register route.

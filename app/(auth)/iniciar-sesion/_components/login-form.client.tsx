@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "next-view-transitions";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import {
@@ -24,29 +25,22 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { AuthPaths } from "@/constants";
-import { useToast } from "@/hooks/use-toast";
+import { SUCCESS_MESSAGES } from "@/constants/messages";
 import { authenticate } from "@/lib/actions";
 import { loginFormSchema as formSchema } from "@/types/schemas";
 
 export const LoginForm: React.FC = () => {
   const searchParams = useSearchParams();
-  const { toast } = useToast();
 
   const callbackUrl = searchParams.get("callbackUrl");
 
   const { mutate: auth, isPending } = useMutation({
     mutationFn: authenticate,
     onSuccess: () => {
-      toast({
-        description: "Sesión iniciada exitosamente",
-        variant: "success",
-      });
+      toast.success(SUCCESS_MESSAGES.LOGIN_SUCCESS);
     },
     onError: (error) => {
-      toast({
-        description: error.message,
-        variant: "destructive",
-      });
+      toast.error(error.message);
     },
   });
 
@@ -54,7 +48,7 @@ export const LoginForm: React.FC = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: "web.christian.dev@gmail.com",
-      password: "KtmN$Pqx1",
+      password: "KtmN$Pqx128",
     },
   });
 

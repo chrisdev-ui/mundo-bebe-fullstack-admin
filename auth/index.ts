@@ -4,11 +4,16 @@ import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import Instagram from "next-auth/providers/instagram";
+import { z } from "zod";
 
 import { authConfig } from "@/auth.config";
 import db from "@/db/drizzle";
-import { getUserByEmailOrUsername, getUserById } from "@/server/lib/users";
-import { loginSchema } from "@/server/schemas";
+import { getUserByEmailOrUsername, getUserById } from "@/lib/users";
+
+const loginSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+});
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,

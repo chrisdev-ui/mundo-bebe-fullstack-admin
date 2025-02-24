@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1722566290326,
-      "tag": "0000_red_shriek",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1727669841072,
-      "tag": "0001_wandering_jamie_braddock",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1728279043837,
-      "tag": "0002_nasty_terror",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1728878874793,
-      "tag": "0003_flowery_mojo",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1729050372685,
-      "tag": "0004_majestic_living_tribunal",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1739670447003,
-      "tag": "0005_fearless_robbie_robertson",
+      "when": 1740349388845,
+      "tag": "0000_eager_kitty_pryde",
       "breakpoints": true
     }
   ]

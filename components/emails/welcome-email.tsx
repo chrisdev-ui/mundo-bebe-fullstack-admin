@@ -4,7 +4,7 @@ import { Container } from "@/components/email-blocks/container.section";
 import { Email } from "@/components/email-blocks/email.section";
 import { Footer } from "@/components/email-blocks/footer.section";
 import { Header } from "@/components/email-blocks/header.section";
-import { UserRole } from "@/types";
+import { UserRole } from "@/types/enum";
 
 type Section = "text" | "buttonContainer" | "button" | "content";
 

@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import { Container } from "@/components/layout/container.server";
-import { ScrollArea } from "../ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AuthContainerProps {
   children: React.ReactNode;
