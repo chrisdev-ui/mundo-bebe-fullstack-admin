@@ -3,7 +3,7 @@
  */
 
 import { not, sql, type AnyColumn } from "drizzle-orm";
-import { pgTableCreator } from "drizzle-orm/pg-core";
+import { customType, pgTableCreator } from "drizzle-orm/pg-core";
 
 import { databasePrefix } from "@/constants";
 
@@ -44,3 +44,9 @@ export function isEmpty<TColumn extends AnyColumn>(column: TColumn) {
 export function isNotEmpty<TColumn extends AnyColumn>(column: TColumn) {
   return not(isEmpty(column));
 }
+
+export const tsVector = customType<{ data: string }>({
+  dataType() {
+    return "tsvector";
+  },
+});
