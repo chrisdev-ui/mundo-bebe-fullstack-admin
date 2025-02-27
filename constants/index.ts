@@ -20,8 +20,8 @@ import {
   startOfWeek,
 } from "date-fns";
 
-import { CustomDate, NavItem, RouteMap, UserRole } from "@/types";
-import { UserRole as UserRoleEnum } from "@/types/enum";
+import { UserRoleValues } from "@/db/schema";
+import type { CustomDate, NavItem, RouteMap, UserRole } from "@/types";
 
 export const databasePrefix = "mundobebe";
 
@@ -104,7 +104,7 @@ export const navItems: NavItem[] = [
     url: "/admin/panel",
     icon: "dashboard",
     isActive: false,
-    accessLevel: [UserRoleEnum.ADMIN],
+    accessLevel: [UserRoleValues.ADMIN],
     items: [],
   },
   {
@@ -112,7 +112,7 @@ export const navItems: NavItem[] = [
     url: "/admin/agregar-admin-user",
     icon: "addAdmin",
     isActive: false,
-    accessLevel: [UserRoleEnum.SUPER_ADMIN],
+    accessLevel: [UserRoleValues.SUPER_ADMIN],
     items: [],
   },
   {
@@ -120,7 +120,7 @@ export const navItems: NavItem[] = [
     url: "/admin/gestionar-usuarios",
     icon: "usersGroup",
     isActive: false,
-    accessLevel: [UserRoleEnum.ADMIN],
+    accessLevel: [UserRoleValues.ADMIN],
     items: [],
   },
   {
@@ -128,35 +128,35 @@ export const navItems: NavItem[] = [
     url: "#",
     icon: "user",
     isActive: false,
-    accessLevel: [UserRoleEnum.ADMIN],
+    accessLevel: [UserRoleValues.ADMIN],
     items: [
       {
         title: "Editar perfil",
         url: "/admin/editar-perfil",
         icon: "userEdit",
         isActive: false,
-        accessLevel: [UserRoleEnum.ADMIN],
+        accessLevel: [UserRoleValues.ADMIN],
       },
       {
         title: "Cambiar contraseña",
         url: "/admin/cambiar-contrasena",
         icon: "password",
         isActive: false,
-        accessLevel: [UserRoleEnum.ADMIN],
+        accessLevel: [UserRoleValues.ADMIN],
       },
       {
         title: "Privacidad",
         url: "/admin/privacidad",
         icon: "privacy",
         isActive: false,
-        accessLevel: [UserRoleEnum.ADMIN],
+        accessLevel: [UserRoleValues.ADMIN],
       },
       {
         title: "Cerrar sesión",
         action: "logout",
         icon: "logout",
         isActive: false,
-        accessLevel: [UserRoleEnum.ADMIN],
+        accessLevel: [UserRoleValues.ADMIN],
       },
     ],
   },

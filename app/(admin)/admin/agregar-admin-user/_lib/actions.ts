@@ -6,7 +6,7 @@ import { and, eq, lt } from "drizzle-orm";
 import { AuthPaths } from "@/constants";
 import { ERRORS } from "@/constants/messages";
 import db from "@/db/drizzle";
-import { invites, users } from "@/db/schema";
+import { invitations, UserRoleValues, users } from "@/db/schema";
 import { env } from "@/env";
 import {
   composeMiddleware,
@@ -17,7 +17,6 @@ import {
 } from "@/lib/middleware";
 import { sendEmail } from "@/lib/sendgrid";
 import { AppError } from "@/lib/utils.api";
-import { UserRole } from "@/types/enum";
 import { formSchema, InviteAdminSchema } from "./validations";
 
 async function createInvitationBase(input: InviteAdminSchema) {
@@ -29,10 +28,10 @@ async function createInvitationBase(input: InviteAdminSchema) {
 
   if (existingUser) throw new AppError(ERRORS.USER_EXISTS);
 
-  const userHasActiveInvitation = await db.query.invites.findFirst({
+  const userHasActiveInvitation = await db.query.invitations.findFirst({
     where: and(
-      eq(invites.email, input.email),
-      lt(invites.expiresAt, new Date()),
+      eq(invitations.email, input.email),
+      lt(invitations.expires, new Date()),
     ),
   });
 
@@ -47,10 +46,10 @@ async function createInvitationBase(input: InviteAdminSchema) {
   url.searchParams.set("email", input.email);
 
   await db.transaction(async (tx) => {
-    await tx.insert(invites).values({
+    await tx.insert(invitations).values({
       email: input.email,
       token,
-      expiresAt,
+      expires: expiresAt,
     });
 
     await sendEmail({
@@ -58,7 +57,7 @@ async function createInvitationBase(input: InviteAdminSchema) {
         templateName: "welcome",
         to: input.email,
         name: input.name,
-        role: UserRole.ADMIN,
+        role: UserRoleValues.ADMIN,
         webUrl: url.toString(),
       },
     });
@@ -72,7 +71,7 @@ export const createInvitation = composeMiddleware<InviteAdminSchema, void>(
     errorMessage: "Datos de invitación inválidos",
   }),
   withAuth({
-    requiredRole: [UserRole.SUPER_ADMIN],
+    requiredRole: [UserRoleValues.SUPER_ADMIN],
     redirectTo: AuthPaths.LOGIN,
   }),
   withRateLimit({

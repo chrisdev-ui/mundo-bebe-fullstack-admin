@@ -15,10 +15,9 @@ import {
 
 import { auth } from "@/auth";
 import db from "@/db/drizzle";
-import { User, users } from "@/db/schema";
+import { User, UserRoleValues, users } from "@/db/schema";
 import { filterColumns } from "@/lib/filter-columns";
 import { unstable_cache } from "@/lib/unstable-cache";
-import { UserRole } from "@/types/enum";
 import { GetUsersSchema } from "./validations";
 
 export async function getUsers(input: GetUsersSchema) {
@@ -41,10 +40,10 @@ export async function getUsers(input: GetUsersSchema) {
         });
 
         const roleFilter =
-          userRole && userRole === UserRole.ADMIN
+          userRole && userRole === UserRoleValues.ADMIN
             ? and(
-                sql`${users.role} != ${UserRole.ADMIN}`,
-                sql`${users.role} != ${UserRole.SUPER_ADMIN}`,
+                sql`${users.role} != ${UserRoleValues.ADMIN}`,
+                sql`${users.role} != ${UserRoleValues.SUPER_ADMIN}`,
                 sql`${users.id} != ${currentUserId}`,
               )
             : sql`${users.id} != ${currentUserId}`;

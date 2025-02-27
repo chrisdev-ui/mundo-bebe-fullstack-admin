@@ -4,7 +4,8 @@ import { Container } from "@/components/email-blocks/container.section";
 import { Email } from "@/components/email-blocks/email.section";
 import { Footer } from "@/components/email-blocks/footer.section";
 import { Header } from "@/components/email-blocks/header.section";
-import { UserRole } from "@/types/enum";
+import { UserRoleValues } from "@/db/schema";
+import type { UserRole } from "@/types";
 
 type Section = "text" | "buttonContainer" | "button" | "content";
 
@@ -20,7 +21,7 @@ export default function WelcomeEmail({
   webUrl,
 }: Partial<WelcomeEmailProps>): React.ReactElement {
   const previewText =
-    role === UserRole.USER || role === UserRole.GUEST
+    role === UserRoleValues.USER || role === UserRoleValues.GUEST
       ? "¡Bienvenido/a a Mundo Bebé!"
       : "¡Bienvenido/a a Mundo Bebé! Completa tu registro de administrador para continuar.";
   return (
@@ -29,7 +30,7 @@ export default function WelcomeEmail({
         <Header />
         <Section style={styles.content}>
           <Text style={styles.text}>¡Bienvenido/a, {name}!</Text>
-          {role === UserRole.USER || role === UserRole.GUEST ? (
+          {role === UserRoleValues.USER || role === UserRoleValues.GUEST ? (
             <>
               <Text style={styles.text}>
                 Estamos felices de tenerte en Mundo Bebé. Comienza a explorar la

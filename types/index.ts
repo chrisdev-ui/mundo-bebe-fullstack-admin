@@ -11,15 +11,14 @@ import { z } from "zod";
 import { Icons } from "@/components/icons";
 import { DataTableConfig } from "@/config/data-table";
 import { MODULES } from "@/constants";
-import { users } from "@/db/schema";
+import { UserRoleType, users } from "@/db/schema";
 import { filterSchema } from "@/lib/parsers";
-import { UserRole } from "./enum";
 
 const authUserSelect = createSelectSchema(users).omit({
   password: true,
 });
 
-export type { UserRole };
+export type { UserRoleType as UserRole };
 
 export interface SearchParams {
   [key: string]: string | string[] | undefined;
@@ -35,7 +34,7 @@ export interface NavItem {
   label?: string;
   description?: string;
   isActive?: boolean;
-  accessLevel: UserRole[];
+  accessLevel: UserRoleType[];
   items?: NavItem[];
 }
 

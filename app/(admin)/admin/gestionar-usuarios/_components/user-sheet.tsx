@@ -39,8 +39,7 @@ import {
 } from "@/components/ui/sheet";
 import { roleMappings } from "@/constants";
 import { SUCCESS_MESSAGES } from "@/constants/messages";
-import { type User } from "@/db/schema";
-import { UserRole as UserRoleEnum } from "@/types/enum";
+import { UserRoleValues, type User } from "@/db/schema";
 import { useCreateUser, useUpdateUser } from "../_hooks/users";
 import {
   createUserSchema,
@@ -96,7 +95,7 @@ export function UserSheet({ user, type, ...props }: UserSheetProps) {
       email: user?.email ?? "",
       phoneNumber: user?.phoneNumber ?? "",
       dob: user?.dob ?? null,
-      role: user?.role ?? UserRoleEnum.USER,
+      role: user?.role ?? UserRoleValues.USER,
       ...(type === "create" && { password: "" }),
     },
   });
@@ -112,7 +111,7 @@ export function UserSheet({ user, type, ...props }: UserSheetProps) {
         email: "",
         phoneNumber: "",
         dob: null,
-        role: UserRoleEnum.USER,
+        role: UserRoleValues.USER,
         password: "",
       });
     } else if (user) {
@@ -154,12 +153,12 @@ export function UserSheet({ user, type, ...props }: UserSheetProps) {
   };
 
   const getAvailableRoles = useMemo(() => {
-    if (session?.user?.role === UserRoleEnum.SUPER_ADMIN) {
-      return [UserRoleEnum.ADMIN, UserRoleEnum.USER, UserRoleEnum.GUEST];
-    } else if (session?.user?.role === UserRoleEnum.ADMIN) {
-      return [UserRoleEnum.USER, UserRoleEnum.GUEST];
+    if (session?.user?.role === UserRoleValues.SUPER_ADMIN) {
+      return [UserRoleValues.ADMIN, UserRoleValues.USER, UserRoleValues.GUEST];
+    } else if (session?.user?.role === UserRoleValues.ADMIN) {
+      return [UserRoleValues.USER, UserRoleValues.GUEST];
     }
-    return [UserRoleEnum.GUEST];
+    return [UserRoleValues.GUEST];
   }, [session]);
 
   return (

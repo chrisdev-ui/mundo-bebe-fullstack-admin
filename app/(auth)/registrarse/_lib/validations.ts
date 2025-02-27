@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import { PASSWORD_VALIDATION_REGEX } from "@/constants";
-import { UserRole } from "@/types/enum";
+import { UserRoleValues } from "@/db/schema";
 
 const baseSchema = z.object({
   name: z
@@ -39,7 +39,7 @@ const baseSchema = z.object({
     .regex(PASSWORD_VALIDATION_REGEX, {
       message: "La contraseña no cumple con los requisitos",
     }),
-  role: z.literal(UserRole.USER),
+  role: z.literal(UserRoleValues.USER),
 });
 
 export const formSchema = baseSchema.refine(

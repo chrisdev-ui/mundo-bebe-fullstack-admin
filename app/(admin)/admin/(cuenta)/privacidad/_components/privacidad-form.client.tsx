@@ -39,8 +39,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SUCCESS_MESSAGES } from "@/constants/messages";
+import { UserRoleValues } from "@/db/schema";
 import { logout } from "@/lib/actions";
-import { UserRole } from "@/types/enum";
 import { deleteAccount } from "../_lib/actions";
 import { formSchema } from "../_lib/validations";
 
@@ -72,11 +72,11 @@ export const PrivacidadForm: React.FC = () => {
     if (!session?.user) return false;
 
     switch (session.user.role) {
-      case UserRole.SUPER_ADMIN:
+      case UserRoleValues.SUPER_ADMIN:
         return false;
-      case UserRole.ADMIN:
-      case UserRole.USER:
-      case UserRole.GUEST:
+      case UserRoleValues.ADMIN:
+      case UserRoleValues.USER:
+      case UserRoleValues.GUEST:
         return session.user.id === targetUserId;
       default:
         return false;
@@ -85,9 +85,9 @@ export const PrivacidadForm: React.FC = () => {
 
   const getDeleteButtonText = () => {
     switch (session?.user?.role) {
-      case UserRole.SUPER_ADMIN:
+      case UserRoleValues.SUPER_ADMIN:
         return "No puedes eliminar tu propia cuenta como Super Administrador";
-      case UserRole.ADMIN:
+      case UserRoleValues.ADMIN:
         return "Eliminar cuenta";
       default:
         return "Eliminar mi cuenta";

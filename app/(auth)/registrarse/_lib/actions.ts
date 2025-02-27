@@ -5,7 +5,7 @@ import { and, eq, gt } from "drizzle-orm";
 
 import { ERRORS } from "@/constants/messages";
 import db from "@/db/drizzle";
-import { invites, users } from "@/db/schema";
+import { invitations, UserRoleValues, users } from "@/db/schema";
 import { env } from "@/env";
 import {
   composeMiddleware,
@@ -15,7 +15,7 @@ import {
 } from "@/lib/middleware";
 import { generatePassword } from "@/lib/utils";
 import { AppError } from "@/lib/utils.api";
-import { UserRole } from "@/types/enum";
+import { UserRole } from "@/types";
 import { actionSchema, RegisterSchema } from "./validations";
 
 async function registerBase(input: RegisterSchema) {
@@ -27,29 +27,29 @@ async function registerBase(input: RegisterSchema) {
 
   if (existingUser) throw new AppError(ERRORS.USER_EXISTS);
 
-  let userRole = env.SUPER_ADMIN_EMAIL.includes(input.email)
-    ? UserRole.SUPER_ADMIN
-    : UserRole.USER;
+  let userRole: UserRole = env.SUPER_ADMIN_EMAIL.includes(input.email)
+    ? UserRoleValues.SUPER_ADMIN
+    : UserRoleValues.USER;
 
   await db.transaction(async (tx) => {
     if (input.code) {
-      const invitation = await tx.query.invites.findFirst({
+      const invitation = await tx.query.invitations.findFirst({
         where: and(
-          eq(invites.token, input.code),
-          eq(invites.email, input.email),
-          gt(invites.expiresAt, new Date()),
+          eq(invitations.token, input.code),
+          eq(invitations.email, input.email),
+          gt(invitations.expires, new Date()),
         ),
       });
 
       if (!invitation || invitation.used)
         throw new AppError(ERRORS.INVALID_CODE);
 
-      userRole = UserRole.ADMIN;
+      userRole = UserRoleValues.ADMIN;
 
       await tx
-        .update(invites)
+        .update(invitations)
         .set({ used: true })
-        .where(eq(invites.id, invitation.id));
+        .where(eq(invitations.id, invitation.id));
     }
 
     const hash = generatePassword(input.password);

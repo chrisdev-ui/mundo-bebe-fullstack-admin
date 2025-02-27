@@ -5,7 +5,7 @@ import {
   MAX_FILE_SIZE,
   PASSWORD_VALIDATION_REGEX,
 } from "@/constants";
-import { UserRole } from "./enum";
+import { userRole } from "@/db/schema";
 
 export const loginFormSchema = z.object({
   username: z.string().trim().min(1, {
@@ -59,7 +59,7 @@ export const editProfileSchema = z.object({
   dob: z
     .union([z.date(), z.string().transform((str) => new Date(str)), z.null()])
     .optional(),
-  role: z.nativeEnum(UserRole),
+  role: z.enum(userRole.enumValues),
 });
 
 export const changePasswordSchema = z

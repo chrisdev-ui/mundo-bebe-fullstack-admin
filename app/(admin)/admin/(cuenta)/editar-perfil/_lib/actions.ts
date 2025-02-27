@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 
 import { ERRORS } from "@/constants/messages";
 import db from "@/db/drizzle";
-import { users } from "@/db/schema";
+import { UserRoleValues, users } from "@/db/schema";
 import {
   ActionContext,
   composeMiddleware,
@@ -15,7 +15,6 @@ import {
   withValidation,
 } from "@/lib/middleware";
 import { AppError } from "@/lib/utils.api";
-import { UserRole } from "@/types/enum";
 import { EditProfileSchema, formSchema } from "./validations";
 
 async function updateProfileBase(
@@ -59,7 +58,11 @@ export const updateProfile = composeMiddleware<EditProfileSchema, void>(
     errorMessage: "Datos de perfil inválidos",
   }),
   withAuth({
-    requiredRole: [UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN],
+    requiredRole: [
+      UserRoleValues.USER,
+      UserRoleValues.ADMIN,
+      UserRoleValues.SUPER_ADMIN,
+    ],
   }),
   withRateLimit({
     requests: 10,

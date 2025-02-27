@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 
 import { ERRORS } from "@/constants/messages";
 import db from "@/db/drizzle";
-import { users } from "@/db/schema";
+import { UserRoleValues, users } from "@/db/schema";
 import {
   ActionContext,
   composeMiddleware,
@@ -17,7 +17,6 @@ import {
 } from "@/lib/middleware";
 import { generatePassword } from "@/lib/utils";
 import { AppError } from "@/lib/utils.api";
-import { UserRole } from "@/types/enum";
 import { ChangePasswordSchema, formSchema } from "./validations";
 
 async function changePasswordBase(
@@ -62,7 +61,11 @@ export const changePassword = composeMiddleware<ChangePasswordSchema, void>(
     errorMessage: "Datos de cambio de contraseña inválidos",
   }),
   withAuth({
-    requiredRole: [UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN],
+    requiredRole: [
+      UserRoleValues.USER,
+      UserRoleValues.ADMIN,
+      UserRoleValues.SUPER_ADMIN,
+    ],
   }),
   withRateLimit({
     requests: 5,

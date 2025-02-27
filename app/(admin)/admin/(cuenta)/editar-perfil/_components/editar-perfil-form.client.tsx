@@ -26,9 +26,9 @@ import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { roleMappings } from "@/constants";
 import { SUCCESS_MESSAGES } from "@/constants/messages";
+import { UserRoleValues } from "@/db/schema";
 import { deleteBlob } from "@/lib/actions";
 import { type UserRole } from "@/types";
-import { UserRole as UserRoleEnum } from "@/types/enum";
 import { updateProfile } from "../_lib/actions";
 import { formSchema } from "../_lib/validations";
 
@@ -47,7 +47,7 @@ export const EditarPerfilForm: React.FC = () => {
       email: session?.user.email ?? "",
       phoneNumber: session?.user.phoneNumber ?? "",
       dob: session?.user?.dob ?? undefined,
-      role: (session?.user?.role as UserRole) ?? UserRoleEnum.USER,
+      role: (session?.user?.role as UserRole) ?? UserRoleValues.USER,
     }),
     [session],
   );

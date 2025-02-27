@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 
 import { ERRORS } from "@/constants/messages";
 import db from "@/db/drizzle";
-import { users } from "@/db/schema";
+import { UserRoleValues, users } from "@/db/schema";
 import {
   ActionContext,
   composeMiddleware,
@@ -15,7 +15,6 @@ import {
   withValidation,
 } from "@/lib/middleware";
 import { AppError } from "@/lib/utils.api";
-import { UserRole } from "@/types/enum";
 import { DeleteAccountSchema, formSchema } from "./validations";
 
 async function deleteAccountBase(
@@ -46,12 +45,12 @@ async function deleteAccountBase(
 
   // Check delete permissions based on role
   switch (ctx.session.user.role) {
-    case UserRole.SUPER_ADMIN:
+    case UserRoleValues.SUPER_ADMIN:
       throw new AppError(ERRORS.SUPER_ADMIN_SELF_DELETE);
 
-    case UserRole.ADMIN:
-    case UserRole.USER:
-    case UserRole.GUEST:
+    case UserRoleValues.ADMIN:
+    case UserRoleValues.USER:
+    case UserRoleValues.GUEST:
       if (ctx.session.user.id !== userToDelete.id) {
         throw new AppError(ERRORS.USER_DELETE_UNAUTHORIZED);
       }
@@ -71,7 +70,7 @@ export const deleteAccount = composeMiddleware<DeleteAccountSchema, void>(
     errorMessage: "Datos de confirmación inválidos",
   }),
   withAuth({
-    requiredRole: [UserRole.USER, UserRole.ADMIN],
+    requiredRole: [UserRoleValues.USER, UserRoleValues.ADMIN],
   }),
   withRateLimit({
     requests: 3,

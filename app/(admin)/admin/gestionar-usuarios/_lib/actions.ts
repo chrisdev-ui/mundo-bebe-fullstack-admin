@@ -5,7 +5,7 @@ import { eq, inArray } from "drizzle-orm";
 
 import { ERRORS, SUCCESS_MESSAGES } from "@/constants/messages";
 import db from "@/db/drizzle";
-import { users } from "@/db/schema";
+import { UserRoleValues, users } from "@/db/schema";
 import { takeFirstOrThrow } from "@/db/utils";
 import { deleteBlob } from "@/lib/actions";
 import {
@@ -17,7 +17,7 @@ import {
   withValidation,
 } from "@/lib/middleware";
 import { AppError } from "@/lib/utils.api";
-import { UserRole } from "@/types/enum";
+import { UserRole } from "@/types";
 import {
   createUserSchema,
   CreateUserSchema,
@@ -30,10 +30,14 @@ function canManageRole(
   targetRole: UserRole,
 ): boolean {
   const roleHierarchy: Record<UserRole, UserRole[]> = {
-    [UserRole.SUPER_ADMIN]: [UserRole.ADMIN, UserRole.USER, UserRole.GUEST],
-    [UserRole.ADMIN]: [UserRole.USER, UserRole.GUEST],
-    [UserRole.USER]: [],
-    [UserRole.GUEST]: [],
+    [UserRoleValues.SUPER_ADMIN]: [
+      UserRoleValues.ADMIN,
+      UserRoleValues.USER,
+      UserRoleValues.GUEST,
+    ],
+    [UserRoleValues.ADMIN]: [UserRoleValues.USER, UserRoleValues.GUEST],
+    [UserRoleValues.USER]: [],
+    [UserRoleValues.GUEST]: [],
   };
 
   return roleHierarchy[currentUserRole]?.includes(targetRole) ?? false;
@@ -65,7 +69,8 @@ async function createUserBase(
       .values({
         name: input.name,
         lastName: input.lastName,
-        username: input.username,
+        username: input.username ?? input.email,
+        password: input.password,
         email: input.email,
         phoneNumber: input.phoneNumber,
         image: input.image as string,
@@ -207,7 +212,7 @@ export const createUser = composeMiddleware<
     errorMessage: "Datos de usuario inválidos",
   }),
   withAuth({
-    requiredRole: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+    requiredRole: [UserRoleValues.ADMIN, UserRoleValues.SUPER_ADMIN],
   }),
   withRateLimit({
     requests: 10,
@@ -225,7 +230,7 @@ export const updateUser = composeMiddleware<
     errorMessage: "Datos de usuario inválidos",
   }),
   withAuth({
-    requiredRole: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+    requiredRole: [UserRoleValues.ADMIN, UserRoleValues.SUPER_ADMIN],
   }),
   withRateLimit({
     requests: 10,
@@ -239,7 +244,7 @@ export const deleteUsers = composeMiddleware<
 >(
   withErrorHandling(),
   withAuth({
-    requiredRole: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
+    requiredRole: [UserRoleValues.ADMIN, UserRoleValues.SUPER_ADMIN],
   }),
   withRateLimit({
     requests: 5,

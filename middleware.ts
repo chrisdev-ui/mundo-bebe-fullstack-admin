@@ -6,7 +6,7 @@ import { authConfig } from "@/auth.config";
 import { AdminPaths, AuthPaths, PublicPaths } from "@/constants";
 import { env } from "@/env";
 import { isAdminPath, isAuthFlowPath, isProtectedPath } from "@/lib/utils";
-import { UserRole } from "./types/enum";
+import { UserRoleValues } from "./db/schema";
 
 const redirect = (origin: string, destination: string) => {
   const targetUrl = new URL(`${origin}${destination}`);
@@ -44,8 +44,8 @@ export default NextAuth(authConfig).auth(async (request) => {
 
   if (isAuthRoute && isLoggedIn) {
     if (
-      session?.user?.role === UserRole.SUPER_ADMIN ||
-      session?.user?.role === UserRole.ADMIN
+      session?.user?.role === UserRoleValues.SUPER_ADMIN ||
+      session?.user?.role === UserRoleValues.ADMIN
     ) {
       return redirect(origin, AdminPaths.ADMIN_PANEL);
     }
@@ -54,8 +54,8 @@ export default NextAuth(authConfig).auth(async (request) => {
 
   if (isAdminRoute && isLoggedIn) {
     if (
-      session?.user?.role === UserRole.SUPER_ADMIN ||
-      session?.user?.role === UserRole.ADMIN
+      session?.user?.role === UserRoleValues.SUPER_ADMIN ||
+      session?.user?.role === UserRoleValues.ADMIN
     ) {
       return response;
     }

@@ -69,11 +69,11 @@ export const userRole = pgEnum("user_role", [
 ]);
 
 const timestamps = {
-  updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
-  createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
 };
 
-export const address = pgTable(
+export const addresses = pgTable(
   "address",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -94,7 +94,7 @@ export const address = pgTable(
   (table) => ({
     userFk: foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
     }).onDelete("cascade"),
     userTypeIdx: index("address_user_type_idx").on(table.userId, table.type),
     phoneCheck: check(
@@ -104,16 +104,14 @@ export const address = pgTable(
   }),
 );
 
-export const invitation = pgTable(
+export const invitations = pgTable(
   "invitation",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     email: text().notNull(),
     token: text().notNull(),
-    expires: timestamp({ mode: "string" }).notNull(),
-    createdAt: timestamp("created_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
+    expires: timestamp({ mode: "date" }).notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
     used: boolean().default(false).notNull(),
   },
   (table) => {
@@ -132,13 +130,13 @@ export const session = pgTable(
   {
     sessionToken: text().primaryKey().notNull(),
     userId: uuid().notNull(),
-    expires: timestamp({ mode: "string" }).notNull(),
+    expires: timestamp({ mode: "date" }).notNull(),
   },
   (table) => {
     return {
       sessionUserIdUserIdFk: foreignKey({
         columns: [table.userId],
-        foreignColumns: [user.id],
+        foreignColumns: [users.id],
         name: "session_userId_user_id_fk",
       }).onDelete("cascade"),
       expiryCheck: check("expiry_future_check", sql`${table.expires} > NOW()`),
@@ -146,7 +144,7 @@ export const session = pgTable(
   },
 );
 
-export const user = pgTable(
+export const users = pgTable(
   "user",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -156,11 +154,11 @@ export const user = pgTable(
     password: text().notNull(),
     email: text().notNull(),
     documentId: text("document_id"),
-    emailVerified: timestamp({ mode: "string" }),
+    emailVerified: timestamp({ mode: "date" }),
     role: userRole().default("USER").notNull(),
     image: text(),
     phoneNumber: text("phone_number"),
-    dob: timestamp({ mode: "string" }),
+    dob: timestamp({ mode: "date" }),
     active: boolean().default(true).notNull(),
     ...timestamps,
   },
@@ -201,7 +199,7 @@ export const verificationToken = pgTable(
   {
     identifier: text().notNull(),
     token: text().notNull(),
-    expires: timestamp({ mode: "string" }).notNull(),
+    expires: timestamp({ mode: "date" }).notNull(),
   },
   (table) => {
     return {
@@ -229,7 +227,7 @@ export const authenticator = pgTable(
     return {
       authenticatorUserIdUserIdFk: foreignKey({
         columns: [table.userId],
-        foreignColumns: [user.id],
+        foreignColumns: [users.id],
         name: "authenticator_userId_user_id_fk",
       }).onDelete("cascade"),
       authenticatorUserIdCredentialIdPk: primaryKey({
@@ -262,7 +260,7 @@ export const account = pgTable(
     return {
       accountUserIdUserIdFk: foreignKey({
         columns: [table.userId],
-        foreignColumns: [user.id],
+        foreignColumns: [users.id],
         name: "account_userId_user_id_fk",
       }).onDelete("cascade"),
       accountProviderProviderAccountIdPk: primaryKey({
@@ -273,7 +271,7 @@ export const account = pgTable(
   },
 );
 
-export const category = pgTable(
+export const categories = pgTable(
   "category",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -289,7 +287,7 @@ export const category = pgTable(
   }),
 );
 
-export const subcategory = pgTable(
+export const subcategories = pgTable(
   "subcategory",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -303,14 +301,14 @@ export const subcategory = pgTable(
   (table) => ({
     categoryFk: foreignKey({
       columns: [table.categoryId],
-      foreignColumns: [category.id],
+      foreignColumns: [categories.id],
     }).onDelete("cascade"),
     slugUnique: unique("subcategory_slug_unique").on(table.slug),
     nameIdx: index("sub_category_name_idx").on(sql`lower(${table.name})`),
   }),
 );
 
-export const size = pgTable(
+export const sizes = pgTable(
   "size",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -325,7 +323,7 @@ export const size = pgTable(
   }),
 );
 
-export const color = pgTable(
+export const colors = pgTable(
   "color",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -339,7 +337,7 @@ export const color = pgTable(
   }),
 );
 
-export const design = pgTable(
+export const designs = pgTable(
   "design",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -354,7 +352,7 @@ export const design = pgTable(
   }),
 );
 
-export const product = pgTable(
+export const products = pgTable(
   "product",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -370,7 +368,7 @@ export const product = pgTable(
   (table) => ({
     subcategoryFk: foreignKey({
       columns: [table.subcategoryId],
-      foreignColumns: [subcategory.id],
+      foreignColumns: [subcategories.id],
     }).onDelete("cascade"),
     slugUnique: unique("product_slug_unique").on(table.slug),
     activeArchivedIdx: index("product_active_archived_idx").on(
@@ -391,7 +389,7 @@ export const product = pgTable(
   }),
 );
 
-export const productVariant = pgTable(
+export const productVariants = pgTable(
   "product_variant",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -407,23 +405,23 @@ export const productVariant = pgTable(
   (table) => ({
     productFk: foreignKey({
       columns: [table.productId],
-      foreignColumns: [product.id],
+      foreignColumns: [products.id],
     }).onDelete("cascade"),
     sizeFk: foreignKey({
       columns: [table.sizeId],
-      foreignColumns: [size.id],
+      foreignColumns: [sizes.id],
     }).onDelete("set null"),
     colorFk: foreignKey({
       columns: [table.colorId],
-      foreignColumns: [color.id],
+      foreignColumns: [colors.id],
     }).onDelete("set null"),
     designFk: foreignKey({
       columns: [table.designId],
-      foreignColumns: [design.id],
+      foreignColumns: [designs.id],
     }).onDelete("set null"),
     typeFk: foreignKey({
       columns: [table.typeId],
-      foreignColumns: [productType.id],
+      foreignColumns: [productTypes.id],
     }).onDelete("set null"),
     skuUnique: unique("variant_sku_unique").on(table.sku),
     variantComboUnique: unique("variant_combination_unique").on(
@@ -446,20 +444,20 @@ export const productVariant = pgTable(
   }),
 );
 
-export const productVariantInventory = pgTable(
+export const productVariantsInventory = pgTable(
   "product_variant_inventory",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     variantId: uuid().notNull(),
     stock: integer().notNull().default(0).$type<number>(),
     lowStockThreshold: integer().notNull().default(5).$type<number>(),
-    restockDate: timestamp({ mode: "string" }),
+    restockDate: timestamp({ mode: "date" }),
     ...timestamps,
   },
   (table) => ({
     variantFk: foreignKey({
       columns: [table.variantId],
-      foreignColumns: [productVariant.id],
+      foreignColumns: [productVariants.id],
     }).onDelete("cascade"),
     stockIdx: index("inventory_stock_idx").on(table.stock),
     variantIdx: index("inventory_variant_idx").on(table.variantId),
@@ -471,7 +469,7 @@ export const productVariantInventory = pgTable(
   }),
 );
 
-export const productImage = pgTable(
+export const productImages = pgTable(
   "product_image",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -484,30 +482,28 @@ export const productImage = pgTable(
   (table) => ({
     variantFk: foreignKey({
       columns: [table.variantId],
-      foreignColumns: [productVariant.id],
+      foreignColumns: [productVariants.id],
     }).onDelete("cascade"),
     orderCheck: check("order_non_negative", sql`${table.order} >= 0`),
   }),
 );
 
-export const wishlist = pgTable(
+export const wishlists = pgTable(
   "wishlist",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
     userId: uuid().notNull(),
     variantId: uuid().notNull(),
-    createdAt: timestamp("created_at", { mode: "string" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   },
   (table) => ({
     userFk: foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
     }).onDelete("cascade"),
     variantFk: foreignKey({
       columns: [table.variantId],
-      foreignColumns: [productVariant.id],
+      foreignColumns: [productVariants.id],
     }).onDelete("cascade"),
     userVariantIdx: uniqueIndex("wishlist_user_variant_unique").on(
       table.userId,
@@ -516,7 +512,7 @@ export const wishlist = pgTable(
   }),
 );
 
-export const order = pgTable(
+export const orders = pgTable(
   "order",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -535,19 +531,19 @@ export const order = pgTable(
   (table) => ({
     userFk: foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
     }).onDelete("cascade"),
     couponFk: foreignKey({
       columns: [table.couponId],
-      foreignColumns: [coupon.id],
+      foreignColumns: [coupons.id],
     }).onDelete("set null"),
     billingAddressFk: foreignKey({
       columns: [table.billingAddressId],
-      foreignColumns: [address.id],
+      foreignColumns: [addresses.id],
     }).onDelete("restrict"),
     shippingAddressFk: foreignKey({
       columns: [table.shippingAddressId],
-      foreignColumns: [address.id],
+      foreignColumns: [addresses.id],
     }).onDelete("restrict"),
     userStatusIdx: index("order_user_status_idx").on(
       table.userId,
@@ -569,7 +565,7 @@ export const order = pgTable(
   }),
 );
 
-export const orderItem = pgTable(
+export const orderItems = pgTable(
   "order_item",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -585,15 +581,15 @@ export const orderItem = pgTable(
   (table) => ({
     orderFk: foreignKey({
       columns: [table.orderId],
-      foreignColumns: [order.id],
+      foreignColumns: [orders.id],
     }).onDelete("cascade"),
     variantFk: foreignKey({
       columns: [table.variantId],
-      foreignColumns: [productVariant.id],
+      foreignColumns: [productVariants.id],
     }).onDelete("cascade"),
     discountFk: foreignKey({
       columns: [table.discountId],
-      foreignColumns: [discount.id],
+      foreignColumns: [discounts.id],
     }).onDelete("set null"),
     uniqueVariantOrder: unique("order_variant_unique").on(
       table.orderId,
@@ -617,7 +613,7 @@ export const orderItem = pgTable(
   }),
 );
 
-export const payment = pgTable(
+export const payments = pgTable(
   "payment",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -635,7 +631,7 @@ export const payment = pgTable(
   (table) => ({
     orderFk: foreignKey({
       columns: [table.orderId],
-      foreignColumns: [order.id],
+      foreignColumns: [orders.id],
     }).onDelete("cascade"),
     transactionUnique: unique("payment_transaction_unique").on(
       table.transactionId,
@@ -645,7 +641,7 @@ export const payment = pgTable(
   }),
 );
 
-export const shipping = pgTable(
+export const shippings = pgTable(
   "shipping",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -653,20 +649,20 @@ export const shipping = pgTable(
     status: shippingStatus("shipping_status").notNull().default("PROCESSING"),
     courier: text(),
     trackingNumber: text(),
-    estimatedDelivery: timestamp({ mode: "string" }),
+    estimatedDelivery: timestamp({ mode: "date" }),
     shippingCost: integer().notNull().default(0),
     addressId: uuid().notNull(),
-    actualDelivery: timestamp({ mode: "string" }),
+    actualDelivery: timestamp({ mode: "date" }),
     ...timestamps,
   },
   (table) => ({
     orderFk: foreignKey({
       columns: [table.orderId],
-      foreignColumns: [order.id],
+      foreignColumns: [orders.id],
     }).onDelete("cascade"),
     addressFk: foreignKey({
       columns: [table.addressId],
-      foreignColumns: [address.id],
+      foreignColumns: [addresses.id],
     }).onDelete("cascade"),
     trackingUnique: unique("shipping_tracking_unique").on(table.trackingNumber),
     statusIdx: index("shipping_status_idx").on(table.status),
@@ -681,7 +677,7 @@ export const shipping = pgTable(
   }),
 );
 
-export const review = pgTable(
+export const reviews = pgTable(
   "review",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -696,11 +692,11 @@ export const review = pgTable(
   (table) => ({
     productFk: foreignKey({
       columns: [table.productId],
-      foreignColumns: [product.id],
+      foreignColumns: [products.id],
     }).onDelete("cascade"),
     userFk: foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
     }).onDelete("cascade"),
     productRatingIdx: index("review_product_rating_idx").on(
       table.productId,
@@ -714,7 +710,7 @@ export const review = pgTable(
   }),
 );
 
-export const supplier = pgTable(
+export const suppliers = pgTable(
   "supplier",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -741,7 +737,7 @@ export const supplier = pgTable(
   }),
 );
 
-export const productSupplier = pgTable(
+export const productSuppliers = pgTable(
   "product_supplier",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -757,11 +753,11 @@ export const productSupplier = pgTable(
   (table) => ({
     productFk: foreignKey({
       columns: [table.productId],
-      foreignColumns: [product.id],
+      foreignColumns: [products.id],
     }).onDelete("cascade"),
     supplierFk: foreignKey({
       columns: [table.supplierId],
-      foreignColumns: [supplier.id],
+      foreignColumns: [suppliers.id],
     }).onDelete("cascade"),
     supplierPriceCheck: check(
       "supplier_price_positive",
@@ -778,7 +774,7 @@ export const productSupplier = pgTable(
   }),
 );
 
-export const productType = pgTable(
+export const productTypes = pgTable(
   "product_type",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -793,7 +789,7 @@ export const productType = pgTable(
   }),
 );
 
-export const coupon = pgTable(
+export const coupons = pgTable(
   "coupon",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -803,8 +799,8 @@ export const coupon = pgTable(
     minPurchase: integer(),
     maxUses: integer(),
     usedCount: integer().default(0),
-    startDate: timestamp({ mode: "string" }).notNull(),
-    endDate: timestamp({ mode: "string" }),
+    startDate: timestamp({ mode: "date" }).notNull(),
+    endDate: timestamp({ mode: "date" }),
     active: boolean().default(true),
     ...timestamps,
   },
@@ -834,7 +830,7 @@ export const coupon = pgTable(
   }),
 );
 
-export const discount = pgTable(
+export const discounts = pgTable(
   "discount",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -847,8 +843,8 @@ export const discount = pgTable(
     maxUses: integer(),
     usedCount: integer().default(0).notNull(),
     minOrderAmount: integer(),
-    startDate: timestamp({ mode: "string" }).notNull(),
-    endDate: timestamp({ mode: "string" }).notNull(),
+    startDate: timestamp({ mode: "date" }).notNull(),
+    endDate: timestamp({ mode: "date" }).notNull(),
     active: boolean().default(true).notNull(),
     ...timestamps,
   },
@@ -886,7 +882,7 @@ export const discount = pgTable(
   }),
 );
 
-export const discountApplication = pgTable(
+export const discountsApplication = pgTable(
   "discount_application",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -902,27 +898,27 @@ export const discountApplication = pgTable(
   (table) => ({
     discountFk: foreignKey({
       columns: [table.discountId],
-      foreignColumns: [discount.id],
+      foreignColumns: [discounts.id],
     }).onDelete("cascade"),
     productFk: foreignKey({
       columns: [table.productId],
-      foreignColumns: [product.id],
+      foreignColumns: [products.id],
     }).onDelete("cascade"),
     variantFk: foreignKey({
       columns: [table.variantId],
-      foreignColumns: [productVariant.id],
+      foreignColumns: [productVariants.id],
     }).onDelete("cascade"),
     categoryFk: foreignKey({
       columns: [table.categoryId],
-      foreignColumns: [category.id],
+      foreignColumns: [categories.id],
     }).onDelete("cascade"),
     subcategoryFk: foreignKey({
       columns: [table.subcategoryId],
-      foreignColumns: [subcategory.id],
+      foreignColumns: [subcategories.id],
     }).onDelete("cascade"),
     productTypeFk: foreignKey({
       columns: [table.productTypeId],
-      foreignColumns: [productType.id],
+      foreignColumns: [productTypes.id],
     }).onDelete("cascade"),
     discountProductIdx: index("discount_application_product_idx").on(
       table.discountId,
@@ -952,7 +948,7 @@ export const discountApplication = pgTable(
   }),
 );
 
-export const discountUsage = pgTable(
+export const discountsUsage = pgTable(
   "discount_usage",
   {
     id: uuid().defaultRandom().primaryKey().notNull(),
@@ -965,19 +961,19 @@ export const discountUsage = pgTable(
   (table) => ({
     discountFk: foreignKey({
       columns: [table.discountId],
-      foreignColumns: [discount.id],
+      foreignColumns: [discounts.id],
     }).onDelete("cascade"),
     userFk: foreignKey({
       columns: [table.userId],
-      foreignColumns: [user.id],
+      foreignColumns: [users.id],
     }).onDelete("cascade"),
     orderFk: foreignKey({
       columns: [table.orderId],
-      foreignColumns: [order.id],
+      foreignColumns: [orders.id],
     }).onDelete("cascade"),
     variantFk: foreignKey({
       columns: [table.variantId],
-      foreignColumns: [productVariant.id],
+      foreignColumns: [productVariants.id],
     }).onDelete("cascade"),
     discountUserIdx: index("discount_usage_user_idx").on(
       table.discountId,
@@ -989,3 +985,13 @@ export const discountUsage = pgTable(
     ),
   }),
 );
+
+export type User = typeof users.$inferSelect;
+export type UserRoleType = (typeof userRole.enumValues)[number];
+
+export const UserRoleValues = {
+  USER: "USER",
+  GUEST: "GUEST",
+  ADMIN: "ADMIN",
+  SUPER_ADMIN: "SUPER_ADMIN",
+} as const;

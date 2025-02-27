@@ -26,7 +26,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Separator } from "@/components/ui/separator";
 import { AuthPaths } from "@/constants";
 import { SUCCESS_MESSAGES } from "@/constants/messages";
-import { UserRole } from "@/types/enum";
+import { UserRoleValues } from "@/db/schema";
 import { register } from "../_lib/actions";
 import { formSchema } from "../_lib/validations";
 
@@ -45,7 +45,7 @@ export const RegisterForm: React.FC = () => {
       email: email ?? "",
       password: "",
       confirmPassword: "",
-      role: UserRole.USER,
+      role: UserRoleValues.USER,
     },
   });
 

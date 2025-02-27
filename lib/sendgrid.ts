@@ -5,8 +5,8 @@ import { z } from "zod";
 
 import ResetPasswordEmail from "@/components/emails/reset-password-email";
 import WelcomeEmail from "@/components/emails/welcome-email";
+import { UserRoleValues } from "@/db/schema";
 import { env } from "@/env";
-import { UserRole } from "@/types/enum";
 
 sendgrid.setApiKey(env.SENDGRID_API_KEY);
 
@@ -15,7 +15,11 @@ export const DeliverEmailSchema = z
     z.object({
       templateName: z.literal("welcome"),
       role: z
-        .enum([UserRole.USER, UserRole.ADMIN, UserRole.SUPER_ADMIN])
+        .enum([
+          UserRoleValues.USER,
+          UserRoleValues.ADMIN,
+          UserRoleValues.SUPER_ADMIN,
+        ])
         .optional(),
       name: z.string().optional(),
       webUrl: z.string().optional(),

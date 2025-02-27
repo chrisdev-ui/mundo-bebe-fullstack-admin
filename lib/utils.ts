@@ -5,8 +5,8 @@ import { es } from "date-fns/locale";
 import { twMerge } from "tailwind-merge";
 
 import { AdminPaths, AuthPaths, ProtectedPaths } from "@/constants";
-import { NavItem, type UserRole } from "@/types";
-import { UserRole as UserRoleEnum } from "@/types/enum";
+import { UserRoleValues } from "@/db/schema";
+import type { NavItem, UserRole } from "@/types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -18,7 +18,7 @@ export function filterNavItems(
 ): NavItem[] {
   return items.filter((item) => {
     const hasAccess =
-      userRole === UserRoleEnum.SUPER_ADMIN ||
+      userRole === UserRoleValues.SUPER_ADMIN ||
       item.accessLevel.includes(userRole);
     if (hasAccess && item.items) {
       item.items = filterNavItems(item.items, userRole);
@@ -80,11 +80,11 @@ export function formatMonthCaption(
 }
 
 export function isValidUserRole(role: string): boolean {
-  return Object.values(UserRoleEnum).includes(role as UserRole);
+  return Object.values(UserRoleValues).includes(role as UserRole);
 }
 
 export function isAdminUser(role: UserRole) {
-  return role === UserRoleEnum.ADMIN || role === UserRoleEnum.SUPER_ADMIN;
+  return role === UserRoleValues.ADMIN || role === UserRoleValues.SUPER_ADMIN;
 }
 
 export function generatePassword(password: string, length: number = 10) {
