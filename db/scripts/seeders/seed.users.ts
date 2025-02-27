@@ -1,4 +1,4 @@
-import { fakerES_MX as faker, simpleFaker } from "@faker-js/faker";
+import { fakerES as faker, simpleFaker } from "@faker-js/faker";
 import { hash } from "bcrypt-ts";
 
 import db from "@/db/drizzle";
