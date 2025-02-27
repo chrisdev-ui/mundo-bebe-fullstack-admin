@@ -14,6 +14,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { z } from "zod";
 
 export const currency = pgEnum("currency", ["COP", "USD", "EUR"]);
 
@@ -989,9 +990,4 @@ export const discountsUsage = pgTable(
 export type User = typeof users.$inferSelect;
 export type UserRoleType = (typeof userRole.enumValues)[number];
 
-export const UserRoleValues = {
-  USER: "USER",
-  GUEST: "GUEST",
-  ADMIN: "ADMIN",
-  SUPER_ADMIN: "SUPER_ADMIN",
-} as const;
+export const UserRoleValues = z.enum(userRole.enumValues).Enum;
