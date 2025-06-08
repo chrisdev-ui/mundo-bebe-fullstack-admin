@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { AuthCardContainer } from "@/components/layout/auth-card-container.server";
 import { ResetPasswordForm } from "./reset-password-form.client";
 
@@ -7,7 +9,9 @@ export const ResetPasswordCard: React.FC = () => {
       title="Restablecer contraseña"
       description="Crea una nueva contraseña para tu cuenta"
     >
-      <ResetPasswordForm />
+      <Suspense>
+        <ResetPasswordForm />
+      </Suspense>
     </AuthCardContainer>
   );
 };
