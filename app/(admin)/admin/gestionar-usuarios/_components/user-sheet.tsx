@@ -93,6 +93,7 @@ export function UserSheet({ user, type, ...props }: UserSheetProps) {
       lastName: user?.lastName ?? "",
       username: user?.username ?? "",
       email: user?.email ?? "",
+      documentId: user?.documentId ?? "",
       phoneNumber: user?.phoneNumber ?? "",
       dob: user?.dob ?? null,
       role: user?.role ?? UserRoleValues.USER,
@@ -110,6 +111,7 @@ export function UserSheet({ user, type, ...props }: UserSheetProps) {
         username: "",
         email: "",
         phoneNumber: "",
+        documentId: "",
         dob: null,
         role: UserRoleValues.USER,
         password: "",
@@ -122,6 +124,7 @@ export function UserSheet({ user, type, ...props }: UserSheetProps) {
         lastName: user.lastName ?? "",
         username: user.username ?? "",
         email: user.email ?? "",
+        documentId: user.documentId ?? "",
         phoneNumber: user.phoneNumber ?? "",
         dob: typeof user.dob === "string" ? new Date(user.dob) : user.dob,
         role: user.role,
@@ -303,6 +306,22 @@ export function UserSheet({ user, type, ...props }: UserSheetProps) {
                           {...field}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="documentId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Documento de identidad</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder="Documento de identidad"
+                        />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

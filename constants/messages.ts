@@ -38,6 +38,10 @@ export const ERRORS = {
   INVALID_INPUT: "Los datos proporcionados son inválidos",
   REQUIRED_FIELDS: "Todos los campos son requeridos",
   INVALID_CODE: "Código de invitación no válido o vencido",
+  SLUG_ALREADY_EXISTS: "El identificador ya existe",
+  SIZE_ALREADY_EXISTS: "Ya existe una talla con este código",
+  SIZE_NOT_FOUND: "Talla no encontrada",
+  COLOR_ALREADY_EXISTS: "Ya existe un color con este código",
 
   // Generic errors
   INTERNAL_SERVER_ERROR:
@@ -57,4 +61,16 @@ export const SUCCESS_MESSAGES = {
   INVITATION_SENT: "¡Invitación enviada exitosamente! 🚀",
   LOGIN_SUCCESS: "Bienvenido/a a Mundo Bebé! 🎉",
   REGISTERED_USER: "¡Usuario registrado con éxito! 🚀",
+  CATEGORY_CREATED: "¡Categoría creada con éxito! 🚀",
+  CATEGORY_UPDATED: "¡Categoría actualizada con éxito! 🚀",
+  CATEGORY_DELETED: "Categoría(s) eliminada(s) exitosamente ✅",
+  SUBCATEGORY_CREATED: "¡Subcategoría creada con éxito! 🚀",
+  SUBCATEGORY_UPDATED: "¡Subcategoría actualizada con éxito! 🚀",
+  SUBCATEGORY_DELETED: "Subcategoría(s) eliminada(s) exitosamente ✅",
+  SIZE_CREATED: "¡Talla creada con éxito! 🚀",
+  SIZE_UPDATED: "¡Talla actualizada con éxito! 🚀",
+  SIZE_DELETED: "Talla(s) eliminada(s) exitosamente ✅",
+  COLOR_CREATED: "¡Color creado con éxito! 🚀",
+  COLOR_UPDATED: "¡Color actualizado con éxito! 🚀",
+  COLOR_DELETED: "Color(es) eliminado(s) exitosamente ✅",
 } as const;

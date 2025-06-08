@@ -58,6 +58,7 @@ export const actionSchema = baseSchema
       .url({ message: "La URL de la imagen no es válida" })
       .optional(),
     phoneNumber: z.string().optional(),
+    documentId: z.string().optional(),
     dob: z.date({ message: "La fecha de nacimiento no es válida" }).optional(),
     code: z.string().optional(),
   })

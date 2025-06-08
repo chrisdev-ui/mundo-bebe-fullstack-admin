@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -39,6 +40,7 @@ interface FeatureFlagsProviderProps {
 }
 
 export function FeatureFlagsProvider({ children }: FeatureFlagsProviderProps) {
+  const pathname = usePathname();
   const [featureFlags, setFeatureFlags] = useQueryState<FeatureFlagValue[]>(
     "flags",
     {

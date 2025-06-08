@@ -13,7 +13,9 @@ export function DataTableCellDate({
   if (!date) return null;
   return (
     <div className={className} {...props}>
-      {format(date, "dd 'de' MMMM 'de' yyyy", { locale: es })}
+      {format(date, "dd 'de' MMMM 'de' yyyy", {
+        locale: es,
+      })}
     </div>
   );
 }

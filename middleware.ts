@@ -67,6 +67,6 @@ export default NextAuth(authConfig).auth(async (request) => {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|auth|favicon.ico|sitemap.xml|robots.txt|images|$).*)",
+    "/((?!api|_next/static|_next/image|auth|favicon.ico|sitemap.xml|robots.txt|images|socket.io|$).*)",
   ],
 };

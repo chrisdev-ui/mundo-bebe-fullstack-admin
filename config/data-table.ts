@@ -1,4 +1,4 @@
-import { IconBoxModel2, IconPick } from "@tabler/icons-react";
+import { IconFilterPlus, IconFlask2 } from "@tabler/icons-react";
 
 export type DataTableConfig = typeof dataTableConfig;
 
@@ -7,14 +7,14 @@ export const dataTableConfig = {
     {
       label: "Tabla avanzada",
       value: "advancedTable" as const,
-      icon: IconPick,
+      icon: IconFilterPlus,
       tooltipTitle: "Alternar tabla avanzada",
       tooltipDescription: "Un filtro y ordenador para filtrar y ordenar filas.",
     },
     {
       label: "Barra flotante",
       value: "floatingBar" as const,
-      icon: IconBoxModel2,
+      icon: IconFlask2,
       tooltipTitle: "Alternar barra flotante",
       tooltipDescription:
         "Una barra flotante que se mueve a la parte superior de la tabla.",

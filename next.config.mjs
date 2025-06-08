@@ -7,12 +7,6 @@ await jiti.import("./env.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    experimental: {
-        missingSuspenseWithCSRBailout: false,
-        serverActions: {
-            allowedOrigins: ["localhost:3000", "mundobebeja.com"]
-        }
-    },
     images: {
         remotePatterns: [
             {
@@ -21,7 +15,7 @@ const nextConfig = {
                 port: "",
             }
         ]
-    }
+    },
 }
 
 export default nextConfig

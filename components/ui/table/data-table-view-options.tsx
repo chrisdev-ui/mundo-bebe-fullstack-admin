@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { IconCheck, IconSelector, IconSettings2 } from "@tabler/icons-react";
+import { InferSelectModel } from "drizzle-orm";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,10 +18,11 @@ import {
 } from "@/components/ui/popover";
 import { columnLabelMappings } from "@/constants";
 import { cn, toSentenceCase } from "@/lib/utils";
-import { DataTableViewOptionsProps } from "@/types";
+import { DataTableViewOptionsProps, DbTables } from "@/types";
 
 export function DataTableViewOptions<TData>({
   table,
+  tableName,
 }: DataTableViewOptionsProps<TData>) {
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -58,6 +60,9 @@ export function DataTableViewOptions<TData>({
                     column.getCanHide(),
                 )
                 .map((column) => {
+                  const columnName = column.id as keyof InferSelectModel<
+                    DbTables[typeof tableName]
+                  >;
                   return (
                     <CommandItem
                       key={column.id}
@@ -66,7 +71,7 @@ export function DataTableViewOptions<TData>({
                       }
                     >
                       <span className="truncate">
-                        {columnLabelMappings[column.id] ??
+                        {columnLabelMappings[tableName]?.[columnName] ??
                           toSentenceCase(column.id)}
                       </span>
                       <IconCheck

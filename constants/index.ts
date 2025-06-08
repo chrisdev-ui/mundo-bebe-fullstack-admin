@@ -21,7 +21,13 @@ import {
 } from "date-fns";
 
 import { UserRoleValues } from "@/db/schema";
-import type { CustomDate, NavItem, RouteMap, UserRole } from "@/types";
+import type {
+  CustomDate,
+  DataTableMappings,
+  NavItem,
+  RouteMap,
+  UserRole,
+} from "@/types";
 
 export const databasePrefix = "mundobebe";
 
@@ -67,14 +73,49 @@ export const roleIcons: Record<
   SUPER_ADMIN: IconCrown,
 };
 
-export const columnLabelMappings: Record<string, string> = {
-  image: "Foto de perfil",
-  name: "Nombre completo",
-  email: "Correo electrónico",
-  phoneNumber: "Teléfono",
-  role: "Rol",
-  dob: "Fecha de nacimiento",
-  createdAt: "Fecha de creación",
+export const columnLabelMappings: DataTableMappings = {
+  users: {
+    image: "Foto de perfil",
+    name: "Nombre completo",
+    email: "Correo electrónico",
+    phoneNumber: "Teléfono",
+    role: "Rol",
+    dob: "Fecha de nacimiento",
+    active: "Activo",
+    createdAt: "Fecha de creación",
+    documentId: "Documento de identidad",
+    username: "Nombre de usuario",
+    updatedAt: "Última actualización",
+  },
+  categories: {
+    name: "Nombre de la categoría",
+    slug: "Identificador",
+    description: "Descripción",
+    active: "Activo",
+    createdAt: "Fecha de creación",
+    updatedAt: "Última actualización",
+  },
+  subcategories: {
+    name: "Nombre de la subcategoría",
+    slug: "Identificador",
+    description: "Descripción",
+    category: "Categoría",
+    active: "Activo",
+    createdAt: "Fecha de creación",
+    updatedAt: "Última actualización",
+  },
+  sizes: {
+    name: "Nombre de la talla",
+    code: "Código",
+    active: "Activo",
+    createdAt: "Fecha de creación",
+  },
+  colors: {
+    name: "Nombre del color",
+    code: "Color",
+    active: "Activo",
+    createdAt: "Fecha de creación",
+  },
 };
 
 export const MODULES = ["admin", "super-admin", "user", "guest"] as const;
@@ -122,6 +163,43 @@ export const navItems: NavItem[] = [
     isActive: false,
     accessLevel: [UserRoleValues.ADMIN],
     items: [],
+  },
+  {
+    title: "Tienda",
+    url: "#",
+    icon: "store",
+    isActive: false,
+    accessLevel: [UserRoleValues.ADMIN],
+    items: [
+      {
+        title: "Categorías",
+        url: "/admin/tienda/categorias",
+        icon: "category",
+        isActive: false,
+        accessLevel: [UserRoleValues.ADMIN],
+      },
+      {
+        title: "Subcategorías",
+        url: "/admin/tienda/subcategorias",
+        icon: "subcategory",
+        isActive: false,
+        accessLevel: [UserRoleValues.ADMIN],
+      },
+      {
+        title: "Tallas",
+        url: "/admin/tienda/tallas",
+        icon: "size",
+        isActive: false,
+        accessLevel: [UserRoleValues.ADMIN],
+      },
+      {
+        title: "Colores",
+        url: "/admin/tienda/colores",
+        icon: "color",
+        isActive: false,
+        accessLevel: [UserRoleValues.ADMIN],
+      },
+    ],
   },
   {
     title: "Cuenta",
@@ -174,6 +252,11 @@ export enum ProtectedPaths {}
 export enum AdminPaths {
   ADMIN_PANEL = "/admin/panel",
   ADD_ADMIN_USER = "/admin/agregar-admin-user",
+  MANAGE_USERS = "/admin/gestionar-usuarios",
+  CATEGORIES = "/admin/tienda/categorias",
+  SUBCATEGORIES = "/admin/tienda/subcategorias",
+  SIZES = "/admin/tienda/tallas",
+  COLORS = "/admin/tienda/colores",
 }
 
 export enum AuthPaths {

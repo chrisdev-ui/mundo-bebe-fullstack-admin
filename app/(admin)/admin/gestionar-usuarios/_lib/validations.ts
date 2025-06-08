@@ -1,6 +1,7 @@
 import {
   createSearchParamsCache,
   parseAsArrayOf,
+  parseAsBoolean,
   parseAsInteger,
   parseAsString,
   parseAsStringEnum,
@@ -28,7 +29,9 @@ export const searchParamsCache = createSearchParamsCache({
   username: parseAsString.withDefault(""),
   email: parseAsString.withDefault(""),
   phone: parseAsString.withDefault(""),
+  documentId: parseAsString.withDefault(""),
   role: parseAsArrayOf(z.enum(users.role.enumValues)).withDefault([]),
+  active: parseAsBoolean.withDefault(true),
   from: parseAsString.withDefault(""),
   to: parseAsString.withDefault(""),
   // advanced filter
@@ -57,6 +60,7 @@ export const updateUserSchema = z.object({
   username: z.string().optional(),
   email: z.string().email().optional(),
   phoneNumber: z.string().optional(),
+  documentId: z.string().optional(),
   role: z.enum(users.role.enumValues).optional(),
   dob: z.date().nullable().optional(),
 });
@@ -88,6 +92,7 @@ export const createUserSchema = z.object({
   username: z.string().optional(),
   email: z.string().email(),
   phoneNumber: z.string().optional(),
+  documentId: z.string().optional(),
   role: z.enum(users.role.enumValues),
   dob: z.date().nullable().optional(),
 });
@@ -104,6 +109,7 @@ export const updateUserActionSchema = z.object({
   username: updateUserSchema.shape.username,
   email: updateUserSchema.shape.email,
   phoneNumber: updateUserSchema.shape.phoneNumber,
+  documentId: updateUserSchema.shape.documentId,
   role: updateUserSchema.shape.role,
   dob: updateUserSchema.shape.dob,
 });

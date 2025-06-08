@@ -73,6 +73,16 @@ export const ManageUsersTable: React.FC<ManageUsersTableProps> = ({
       type: "text",
     },
     {
+      id: "documentId",
+      label: "Documento de identidad",
+      type: "text",
+    },
+    {
+      id: "active",
+      label: "Activo",
+      type: "boolean",
+    },
+    {
       id: "phoneNumber",
       label: "Teléfono",
       type: "text",
@@ -128,6 +138,7 @@ export const ManageUsersTable: React.FC<ManageUsersTableProps> = ({
         {enableAdvancedTable ? (
           <DataTableAdvancedToolbar
             table={table}
+            tableName="users"
             filterFields={advancedFilterFields}
             shallow={false}
           >
@@ -137,7 +148,11 @@ export const ManageUsersTable: React.FC<ManageUsersTableProps> = ({
             />
           </DataTableAdvancedToolbar>
         ) : (
-          <DataTableToolbar table={table} filterFields={filterFields}>
+          <DataTableToolbar
+            table={table}
+            tableName="users"
+            filterFields={filterFields}
+          >
             <ManageUsersToolbarActions
               table={table}
               setRowAction={setRowAction}

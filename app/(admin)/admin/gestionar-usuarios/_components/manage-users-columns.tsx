@@ -14,6 +14,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DataTableCellBoolean } from "@/components/ui/table/cells/data-table-cell-boolean";
 import { DataTableCellDate } from "@/components/ui/table/cells/data-table-cell-date";
 import { DataTableCellImage } from "@/components/ui/table/cells/data-table-cell-image";
 import { DataTableCellPhone } from "@/components/ui/table/cells/data-table-cell-phone";
@@ -79,6 +80,12 @@ export function getColumns({
       enableColumnFilter: true,
     },
     {
+      accessorKey: "documentId",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Documento de identidad" />
+      ),
+    },
+    {
       accessorKey: "email",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Correo electrónico" />
@@ -114,11 +121,14 @@ export function getColumns({
       },
     },
     {
-      accessorKey: "dob",
+      accessorKey: "active",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Fecha de nacimiento" />
+        <DataTableColumnHeader column={column} title="Estado" />
       ),
-      cell: ({ row }) => <DataTableCellDate date={row.original.dob} />,
+      cell: ({ row }) => <DataTableCellBoolean value={row.original.active} />,
+      filterFn: (row, id, value) => {
+        return value === "true" ? row.getValue(id) : !row.getValue(id);
+      },
     },
     {
       accessorKey: "createdAt",

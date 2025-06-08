@@ -9,7 +9,7 @@ export const Footer = () => {
         <Column align="right" style={{ width: "50%", paddingRight: "8px" }}>
           <Link href="https://www.tiktok.com/@mundobebe" target="_blank">
             <Img
-              src="https://pub-8a8e464c92624fb2a9b19755bfeec6cc.r2.dev/tiktok.png"
+              src="https://pub-8a8e464c92624fb2a9b19755bfeec6cc.r2.dev/tiktok.svg"
               width={28}
               height={28}
             />
@@ -18,7 +18,7 @@ export const Footer = () => {
         <Column align="left" style={{ width: "50%", paddingLeft: "8px" }}>
           <Link href="https://www.instagram.com/mundobebe/" target="_blank">
             <Img
-              src="https://pub-8a8e464c92624fb2a9b19755bfeec6cc.r2.dev/instagram.png"
+              src="https://pub-8a8e464c92624fb2a9b19755bfeec6cc.r2.dev/instagram.svg"
               width={28}
               height={28}
             />

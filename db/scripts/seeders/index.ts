@@ -1,3 +1,4 @@
+import { seedCategories } from "./seed.categories";
 import { seedUsers } from "./seed.users";
 
 async function runSeed() {
@@ -6,6 +7,7 @@ async function runSeed() {
   const start = Date.now();
 
   await seedUsers({ count: 100 });
+  await seedCategories({ count: 15 });
 
   const end = Date.now();
 

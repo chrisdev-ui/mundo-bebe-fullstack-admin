@@ -4,14 +4,21 @@ import {
   Row,
   type Table as TanstackTable,
 } from "@tanstack/react-table";
-import { SQL } from "drizzle-orm";
+import { InferSelectModel, SQL } from "drizzle-orm";
 import { createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
 import { Icons } from "@/components/icons";
 import { DataTableConfig } from "@/config/data-table";
 import { MODULES } from "@/constants";
-import { UserRoleType, users } from "@/db/schema";
+import {
+  categories,
+  colors,
+  sizes,
+  subcategories,
+  UserRoleType,
+  users,
+} from "@/db/schema";
 import { filterSchema } from "@/lib/parsers";
 
 const authUserSelect = createSelectSchema(users).omit({
@@ -128,6 +135,22 @@ export interface DataTableFilterField<TData> {
   options?: Option[];
 }
 
+export type DbTables = {
+  users: typeof users;
+  categories: typeof categories;
+  subcategories: typeof subcategories;
+  sizes: typeof sizes;
+  colors: typeof colors;
+};
+
+export type DataTableMappings = {
+  [TableName in keyof DbTables]: {
+    [ColumnName in
+      | keyof InferSelectModel<DbTables[TableName]>
+      | string]?: string;
+  };
+};
+
 export type ColumnType = DataTableConfig["columnTypes"][number];
 
 export interface DataTableAdvancedFilterField<TData>
@@ -143,11 +166,13 @@ export interface DataTableFacetedFilterProps<TData, TValue> {
 
 export interface DataTableViewOptionsProps<TData> {
   table: TanstackTable<TData>;
+  tableName: keyof DbTables;
 }
 
 export interface DataTableToolbarProps<TData>
   extends React.HTMLAttributes<HTMLDivElement> {
   table: TanstackTable<TData>;
+  tableName: keyof DbTables;
   /**
    * An array of filter field configurations for the data table.
    * When options are provided, a faceted filter is rendered.
@@ -180,6 +205,7 @@ export interface DataTableAdvancedToolbarProps<TData>
    * @type Table<TData>
    */
   table: TanstackTable<TData>;
+  tableName: keyof DbTables;
 
   /**
    * An array of filter field configurations for the data table.

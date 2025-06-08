@@ -86,7 +86,7 @@ const styles: Record<Section, React.CSSProperties> = {
     textAlign: "center",
   },
   button: {
-    backgroundColor: "#ff7096",
+    backgroundColor: "#ff5299",
     borderRadius: "8px",
     color: "#ffffff",
     fontSize: "16px",

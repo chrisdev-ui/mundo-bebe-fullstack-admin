@@ -74,6 +74,7 @@ async function createUserBase(
         email: input.email,
         phoneNumber: input.phoneNumber,
         image: input.image as string,
+        documentId: input.documentId,
         role: input.role,
         dob: input.dob,
       })
@@ -101,7 +102,10 @@ async function deleteUsersBase(
   }
 
   await db.transaction(async (tx) => {
-    await tx.delete(users).where(inArray(users.id, input.ids));
+    await tx
+      .update(users)
+      .set({ active: false, updatedAt: new Date() })
+      .where(inArray(users.id, input.ids));
   });
 
   revalidateTag("users");
@@ -175,6 +179,7 @@ async function updateUserBase(
     email: input.email,
     phoneNumber: input.phoneNumber,
     image: input.image as string,
+    documentId: input.documentId,
     role: input.role,
     dob: input.dob,
     updatedAt: new Date(),

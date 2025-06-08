@@ -15,6 +15,20 @@
       "when": 1740633077808,
       "tag": "0001_secret_justice",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1740715702669,
+      "tag": "0002_superb_typhoid_mary",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1740956043192,
+      "tag": "0003_narrow_lorna_dane",
+      "breakpoints": true
     }
   ]
 }

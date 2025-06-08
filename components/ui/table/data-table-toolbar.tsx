@@ -12,6 +12,7 @@ import { DataTableToolbarProps } from "@/types";
 
 export function DataTableToolbar<TData>({
   table,
+  tableName,
   filterFields = [],
   children,
   className,
@@ -82,7 +83,7 @@ export function DataTableToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         {children}
-        <DataTableViewOptions table={table} />
+        <DataTableViewOptions table={table} tableName={tableName} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { pgTable, index, foreignKey, check, uuid, text, boolean, timestamp, unique, integer, uniqueIndex, primaryKey, pgEnum } from "drizzle-orm/pg-core"
+import { pgTable, index, foreignKey, uuid, text, boolean, timestamp, unique, check, integer, uniqueIndex, primaryKey, pgEnum } from "drizzle-orm/pg-core"
   import { sql } from "drizzle-orm"
 
 export const addressType = pgEnum("address_type", ['BILLING', 'SHIPPING'])
@@ -38,7 +38,6 @@ export const address = pgTable("address", {
 			foreignColumns: [user.id],
 			name: "address_userId_user_id_fk"
 		}).onDelete("cascade"),
-		phoneFormatCheck: check("phone_format_check", sql`(phone IS NULL) OR (phone ~* '^+?[0-9]{10,15}$'::text)`),
 	}
 });
 
@@ -277,6 +276,7 @@ export const order = pgTable("order", {
 	return {
 		couponIdx: index("order_coupon_idx").using("btree", table.couponId.asc().nullsLast()),
 		createdAtIdx: index("order_created_at_idx").using("btree", table.createdAt.asc().nullsLast()),
+		dateStatusIdx: index("order_date_status_idx").using("btree", table.createdAt.asc().nullsLast(), table.orderStatus.asc().nullsLast()),
 		userStatusIdx: index("order_user_status_idx").using("btree", table.userId.asc().nullsLast(), table.orderStatus.asc().nullsLast()),
 		orderBillingAddressIdAddressIdFk: foreignKey({
 			columns: [table.billingAddressId],
@@ -389,6 +389,7 @@ export const product = pgTable("product", {
 		featuredIdx: index("product_featured_idx").using("btree", table.isFeatured.asc().nullsLast(), table.createdAt.asc().nullsLast()),
 		nameIdx: index("product_name_idx").using("btree", sql`lower(name)`),
 		priceIdx: index("product_price_idx").using("btree", table.basePrice.asc().nullsLast()),
+		searchIdx: index("product_search_idx").using("btree", table.name.asc().nullsLast(), table.archived.asc().nullsLast(), table.isFeatured.asc().nullsLast()),
 		subcategoryActiveIdx: index("product_subcategory_active_idx").using("btree", table.subcategoryId.asc().nullsLast(), table.archived.asc().nullsLast()),
 		productSubcategoryIdSubcategoryIdFk: foreignKey({
 			columns: [table.subcategoryId],
@@ -666,9 +667,8 @@ export const supplier = pgTable("supplier", {
 },
 (table) => {
 	return {
+		supplierEmailUnique: unique("supplier_email_unique").on(table.email),
 		supplierTaxIdUnique: unique("supplier_tax_id_unique").on(table.taxId),
-		phoneFormatCheck: check("phone_format_check", sql`(phone IS NULL) OR (phone ~* '^+?[0-9]{10,15}$'::text)`),
-		supplierEmailFormatCheck: check("supplier_email_format_check", sql`(email IS NULL) OR (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$'::text)`),
 	}
 });
 
@@ -693,12 +693,9 @@ export const user = pgTable("user", {
 	return {
 		emailUniqueIdx: uniqueIndex("email_unique_index").using("btree", sql`lower(email)`),
 		ameUniqueIdx: uniqueIndex("username_unique_index").using("btree", sql`lower(username)`),
+		userDocumentIdUnique: unique("user_document_id_unique").on(table.documentId),
 		userEmailUnique: unique("user_email_unique").on(table.email),
 		userUsernameUnique: unique("user_username_unique").on(table.username),
-		dobValidCheck: check("dob_valid_check", sql`(dob IS NULL) OR (dob <= now())`),
-		emailFormatCheck: check("email_format_check", sql`email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,}$'::text`),
-		passwordLengthCheck: check("password_length_check", sql`length(password) >= 8`),
-		phoneFormatCheck: check("phone_format_check", sql`(phone_number IS NULL) OR (phone_number ~* '^+?[0-9]{10,15}$'::text)`),
 	}
 });
 

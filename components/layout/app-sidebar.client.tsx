@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   IconBell,
@@ -56,6 +57,7 @@ import { Company, navItems } from "@/constants";
 import { logout } from "@/lib/actions";
 import { cn, filterNavItems } from "@/lib/utils";
 import type { UserRole } from "@/types";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 export const AppSidebar: React.FC<{
   children: React.ReactNode;
@@ -75,8 +77,17 @@ export const AppSidebar: React.FC<{
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex gap-2 py-2 text-sidebar-accent-foreground">
-            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-              <Company.logo className="size-4" />
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+              <AspectRatio ratio={1 / 1}>
+                <Image
+                  src="/images/logo_mundo_bebe.svg"
+                  alt={`Logo de ${Company.name}`}
+                  fill
+                  className="object-cover"
+                  priority
+                  quality={100}
+                />
+              </AspectRatio>
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-semibold">{Company.name}</span>
@@ -109,7 +120,7 @@ export const AppSidebar: React.FC<{
                               tooltip={item.title}
                               isActive={pathname === item.url}
                             >
-                              {item.icon && <Icon />}
+                              {item.icon && Icon && <Icon />}
                               <span>{item.title}</span>
                               <Icons.chevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                             </SidebarMenuButton>
@@ -137,12 +148,12 @@ export const AppSidebar: React.FC<{
                                     >
                                       {subItem?.url ? (
                                         <Link href={subItem.url}>
-                                          {subItem.icon && <Icon />}
+                                          {subItem.icon && Icon && <Icon />}
                                           <span>{subItem.title}</span>
                                         </Link>
                                       ) : (
                                         <>
-                                          {subItem.icon && <Icon />}
+                                          {subItem.icon && Icon && <Icon />}
                                           <span>{subItem.title}</span>
                                         </>
                                       )}
@@ -168,12 +179,12 @@ export const AppSidebar: React.FC<{
                         >
                           {item.url ? (
                             <Link href={item.url}>
-                              <Icon />
+                              {Icon && <Icon />}
                               <span>{item.title}</span>
                             </Link>
                           ) : (
                             <>
-                              <Icon />
+                              {Icon && <Icon />}
                               <span>{item.title}</span>
                             </>
                           )}

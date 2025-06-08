@@ -8,27 +8,62 @@ function generateColombiandID() {
   return faker.string.numeric({ length: { min: 8, max: 10 } });
 }
 
+function generatePhoneNumber() {
+  const length = faker.number.int({ min: 7, max: 7 });
+  const numbers = faker.string.numeric(length);
+  return `+573${numbers}`;
+}
+
+function generateUsername(firstName: string, lastName: string) {
+  return faker.internet
+    .username({
+      firstName,
+      lastName,
+    })
+    .toLowerCase();
+}
+
+function generateEmail(name: string, lastName: string) {
+  return faker.internet.email({
+    firstName: name,
+    lastName,
+  });
+}
+
 async function generateRandomUser(): Promise<User> {
   const saltRounds = 10;
-  const plainPassword = faker.internet.password();
+  const plainPassword = faker.internet.password({ length: 12 });
   const hashedPassword = await hash(plainPassword, saltRounds);
 
   const now = new Date();
-  const createdAt = faker.date.past();
+  const threeYearsAgo = new Date(
+    now.getFullYear() - 3,
+    now.getMonth(),
+    now.getDate(),
+  );
+  const createdAt = faker.date.between({ from: threeYearsAgo, to: now });
+
+  const name = faker.person.firstName();
+  const lastName = faker.person.lastName();
+
+  const maxBirthDate = new Date();
+  maxBirthDate.setFullYear(maxBirthDate.getFullYear() - 18);
+  const dob = faker.date.between({
+    from: new Date("1950-01-01"),
+    to: maxBirthDate,
+  });
 
   return {
     id: simpleFaker.string.uuid(),
-    name: faker.person.firstName(),
-    lastName: faker.person.lastName(),
-    email: faker.internet.email(),
+    name: name,
+    lastName: lastName,
+    email: generateEmail(name, lastName),
     emailVerified: faker.date.between({ from: createdAt, to: now }),
     image: faker.image.avatar(),
-    dob: faker.date.birthdate(),
-    phoneNumber: faker.phone.number({
-      style: "international",
-    }),
+    dob,
+    phoneNumber: generatePhoneNumber(),
     documentId: generateColombiandID(),
-    username: faker.internet.username(),
+    username: generateUsername(name, lastName),
     password: hashedPassword,
     role: UserRoleValues.USER,
     createdAt,
@@ -41,17 +76,22 @@ export async function seedUsers(input: { count: number }) {
   const count = input.count ?? 100;
 
   try {
-    const allUsers: User[] = [];
-
     for (let i = 0; i < count; i++) {
-      const user = await generateRandomUser();
-      allUsers.push(user);
+      try {
+        const user = await generateRandomUser();
+        await db.insert(users).values(user).onConflictDoNothing();
+      } catch (error) {
+        console.error(`Failed to insert user at index ${i}:`, error);
+        continue;
+      }
     }
 
-    console.log("⏳ Seeding users...", allUsers.length);
-
-    await db.insert(users).values(allUsers).onConflictDoNothing();
+    console.log(`✅ Successfully seeded users`);
   } catch (error) {
     console.error("❌ Error seeding users", error);
+    if (error instanceof Error) {
+      console.error("Error details:", error.message);
+    }
+    throw error;
   }
 }

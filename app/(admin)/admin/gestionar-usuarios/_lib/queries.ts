@@ -5,6 +5,7 @@ import {
   asc,
   count,
   desc,
+  eq,
   gt,
   gte,
   ilike,
@@ -60,6 +61,10 @@ export async function getUsers(input: GetUsersSchema) {
                 : undefined,
               input.email ? ilike(users.email, input.email) : undefined,
               input.phone ? ilike(users.phoneNumber, input.phone) : undefined,
+              input.documentId
+                ? ilike(users.documentId, input.documentId)
+                : undefined,
+              input.active ? eq(users.active, input.active) : undefined,
               input.role.length > 0
                 ? inArray(users.role, input.role)
                 : undefined,

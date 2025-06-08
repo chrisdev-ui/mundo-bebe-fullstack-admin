@@ -6,6 +6,7 @@ import { DataTableAdvancedToolbarProps } from "@/types";
 
 export function DataTableAdvancedToolbar<TData>({
   table,
+  tableName,
   filterFields = [],
   debounceMs = 300,
   shallow = true,
@@ -36,7 +37,7 @@ export function DataTableAdvancedToolbar<TData>({
       </div>
       <div className="flex items-center gap-2">
         {children}
-        <DataTableViewOptions table={table} />
+        <DataTableViewOptions table={table} tableName={tableName} />
       </div>
     </div>
   );

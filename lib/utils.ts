@@ -91,3 +91,22 @@ export function generatePassword(password: string, length: number = 10) {
   const salt = genSaltSync(length);
   return hashSync(password, salt);
 }
+
+/**
+ * Converts a string into a URL-friendly slug
+ * @param {string} text - The text to convert to a slug
+ * @returns {string} The slugified text
+ */
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, "-y-")
+    .replace(/\|/g, "-o-")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}

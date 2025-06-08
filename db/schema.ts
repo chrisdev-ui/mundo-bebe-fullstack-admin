@@ -98,10 +98,6 @@ export const addresses = pgTable(
       foreignColumns: [users.id],
     }).onDelete("cascade"),
     userTypeIdx: index("address_user_type_idx").on(table.userId, table.type),
-    phoneCheck: check(
-      "phone_format_check",
-      sql`${table.phone} IS NULL OR ${table.phone} ~* '^\+?[0-9]{10,15}$'`,
-    ),
   }),
 );
 
@@ -175,22 +171,7 @@ export const users = pgTable(
       ),
       userEmailUnique: unique("user_email_unique").on(table.email),
       userUsernameUnique: unique("user_username_unique").on(table.username),
-      emailCheck: check(
-        "email_format_check",
-        sql`${table.email} ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'`,
-      ),
-      dobCheck: check(
-        "dob_valid_check",
-        sql`${table.dob} IS NULL OR ${table.dob} <= NOW()`,
-      ),
-      phoneCheck: check(
-        "phone_format_check",
-        sql`${table.phoneNumber} IS NULL OR ${table.phoneNumber} ~* '^\+?[0-9]{10,15}$'`,
-      ),
-      passwordCheck: check(
-        "password_length_check",
-        sql`LENGTH(${table.password}) >= 8`,
-      ),
+      documentIdUnique: unique("user_document_id_unique").on(table.documentId),
     };
   },
 );
@@ -387,6 +368,11 @@ export const products = pgTable(
       table.createdAt,
     ),
     basePriceCheck: check("base_price_check", sql`${table.basePrice} >= 0`),
+    productSearchIdx: index("product_search_idx").on(
+      table.name,
+      table.archived,
+      table.isFeatured,
+    ),
   }),
 );
 
@@ -559,6 +545,10 @@ export const orders = pgTable(
     ),
     discountCheck: check("discount_non_negative", sql`${table.discount} >= 0`),
     totalCheck: check("total_non_negative", sql`${table.total} >= 0`),
+    orderDateStatusIdx: index("order_date_status_idx").on(
+      table.createdAt,
+      table.status,
+    ),
     totalValidCheck: check(
       "total_calculation_check",
       sql`${table.total} = ${table.subtotal} + ${table.shippingCost} - ${table.discount}`,
@@ -727,14 +717,7 @@ export const suppliers = pgTable(
   },
   (table) => ({
     taxIdUnique: unique("supplier_tax_id_unique").on(table.taxId),
-    emailCheck: check(
-      "supplier_email_format_check",
-      sql`${table.email} IS NULL OR ${table.email} ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'`,
-    ),
-    phoneCheck: check(
-      "phone_format_check",
-      sql`${table.phone} IS NULL OR ${table.phone} ~* '^\+?[0-9]{10,15}$'`,
-    ),
+    emailUnique: unique("supplier_email_unique").on(table.email),
   }),
 );
 
@@ -988,6 +971,10 @@ export const discountsUsage = pgTable(
 );
 
 export type User = typeof users.$inferSelect;
+export type Category = typeof categories.$inferSelect;
+export type Size = typeof sizes.$inferSelect;
+export type Color = typeof colors.$inferSelect;
+export type Subcategory = typeof subcategories.$inferSelect;
 export type UserRoleType = (typeof userRole.enumValues)[number];
 
 export const UserRoleValues = z.enum(userRole.enumValues).Enum;
