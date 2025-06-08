@@ -442,8 +442,8 @@ const ColorPicker = forwardRef<
                   </div>
                   {!isValidHex(hexInput) && hexInput !== "" && (
                     <p className="text-sm text-destructive">
-                      El valor hexadecimal no es válido. Debe comenzar con "#" y
-                      tener 3 o 6 caracteres hexadecimales.
+                      {`El valor hexadecimal no es válido. Debe comenzar con "#" y
+                      tener 3 o 6 caracteres hexadecimales.`}
                     </p>
                   )}
                 </div>
