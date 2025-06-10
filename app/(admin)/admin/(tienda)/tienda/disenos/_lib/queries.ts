@@ -3,12 +3,12 @@ import "server-only";
 import { and, asc, count, desc, eq, gt, gte, ilike, lte } from "drizzle-orm";
 
 import db from "@/db/drizzle";
-import { sizes } from "@/db/schema";
+import { designs } from "@/db/schema";
 import { filterColumns } from "@/lib/filter-columns";
 import { unstable_cache } from "@/lib/unstable-cache";
-import { GetSizesSchema } from "./validations";
+import { GetDesignsSchema } from "./validations";
 
-export async function getSizes(input: GetSizesSchema) {
+export async function getDesigns(input: GetDesignsSchema) {
   return await unstable_cache(
     async () => {
       try {
@@ -18,7 +18,7 @@ export async function getSizes(input: GetSizesSchema) {
         const advancedTable = input.flags.includes("advancedTable");
 
         const advancedWhere = filterColumns({
-          table: sizes,
+          table: designs,
           filters: input.filters,
           joinOperator: input.joinOperator,
         });
@@ -26,24 +26,27 @@ export async function getSizes(input: GetSizesSchema) {
         const where = advancedTable
           ? advancedWhere
           : and(
-              input.name ? ilike(sizes.name, `%${input.name}%`) : undefined,
-              input.code ? ilike(sizes.code, `%${input.code}%`) : undefined,
-              input.active ? eq(sizes.active, input.active) : undefined,
-              fromDate ? gte(sizes.createdAt, fromDate) : undefined,
-              toDate ? lte(sizes.createdAt, toDate) : undefined,
+              input.name ? ilike(designs.name, `%${input.name}%`) : undefined,
+              input.code ? ilike(designs.code, `%${input.code}%`) : undefined,
+              input.description
+                ? ilike(designs.description, `%${input.description}%`)
+                : undefined,
+              input.active ? eq(designs.active, input.active) : undefined,
+              fromDate ? gte(designs.createdAt, fromDate) : undefined,
+              toDate ? lte(designs.createdAt, toDate) : undefined,
             );
 
         const orderBy =
           input.sort.length > 0
             ? input.sort.map((item) =>
-                item.desc ? desc(sizes[item.id]) : asc(sizes[item.id]),
+                item.desc ? desc(designs[item.id]) : asc(designs[item.id]),
               )
-            : [asc(sizes.order), asc(sizes.name)];
+            : [desc(designs.createdAt)];
 
         const { data, total } = await db.transaction(async (tx) => {
           const data = await tx
             .select()
-            .from(sizes)
+            .from(designs)
             .limit(input.perPage)
             .offset(offset)
             .where(where)
@@ -51,7 +54,7 @@ export async function getSizes(input: GetSizesSchema) {
 
           const total = await tx
             .select({ count: count() })
-            .from(sizes)
+            .from(designs)
             .where(where)
             .execute()
             .then((res) => res[0]?.count ?? 0);
@@ -69,22 +72,22 @@ export async function getSizes(input: GetSizesSchema) {
     [JSON.stringify(input)],
     {
       revalidate: 120,
-      tags: ["sizes"],
+      tags: ["designs"],
     },
   )();
 }
 
-export async function getSizesCount() {
+export async function getDesignsCount() {
   return await unstable_cache(
     async () => {
       try {
         return await db
           .select({
-            active: sizes.active,
+            active: designs.active,
             count: count(),
           })
-          .from(sizes)
-          .groupBy(sizes.active)
+          .from(designs)
+          .groupBy(designs.active)
           .having(gt(count(), 0))
           .then((res) =>
             res.reduce(
@@ -99,7 +102,7 @@ export async function getSizesCount() {
         return { active: 0, inactive: 0 };
       }
     },
-    ["sizes-count"],
+    ["designs-count"],
     {
       revalidate: 120,
     },

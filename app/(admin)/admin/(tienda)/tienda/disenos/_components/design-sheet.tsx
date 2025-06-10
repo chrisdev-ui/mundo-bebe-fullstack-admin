@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { NumericOrderInput } from "@/components/ui/numeric-input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sheet,
@@ -26,53 +25,54 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
-import { Size } from "@/db/schema";
-import { useCreateSize, useUpdateSize } from "../_hooks/sizes";
+import { Textarea } from "@/components/ui/textarea";
+import { Design } from "@/db/schema";
+import { useCreateDesign, useUpdateDesign } from "../_hooks/designs";
 import {
-  createSizeSchema,
-  CreateSizeSchema,
-  UpdateSizeActionSchema,
-  updateSizeSchema,
-  UpdateSizeSchema,
+  createDesignSchema,
+  CreateDesignSchema,
+  UpdateDesignActionSchema,
+  updateDesignSchema,
+  UpdateDesignSchema,
 } from "../_lib/validations";
 
-interface SizeSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
+interface DesignSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
   type: "create" | "update";
-  size: Size | null;
+  design: Design | null;
 }
 
 const messages: Record<"create" | "update", Record<string, string>> = {
   create: {
-    title: "Crear Talla",
-    description: "Añade una nueva talla a tu tienda.",
+    title: "Crear Diseño",
+    description: "Añade un nuevo diseño a tu tienda.",
     submit: "Crear",
     cancel: "Cancelar",
     saving: "Creando",
   },
   update: {
-    title: "Actualizar Talla",
-    description: "Realiza cambios en una talla existente.",
+    title: "Actualizar Diseño",
+    description: "Realiza cambios en un diseño existente.",
     submit: "Actualizar",
     cancel: "Cancelar",
     saving: "Actualizando",
   },
 };
 
-export function SizeSheet({ type, size, ...props }: SizeSheetProps) {
-  const { mutate: createSize, isPending: isCreating } = useCreateSize();
-  const { mutate: updateSize, isPending: isUpdating } = useUpdateSize();
+export function DesignSheet({ type, design, ...props }: DesignSheetProps) {
+  const { mutate: createDesign, isPending: isCreating } = useCreateDesign();
+  const { mutate: updateDesign, isPending: isUpdating } = useUpdateDesign();
 
   const isPending = isCreating || isUpdating;
 
-  const form = useForm<CreateSizeSchema | UpdateSizeSchema>({
+  const form = useForm<CreateDesignSchema | UpdateDesignSchema>({
     resolver: zodResolver(
-      type === "create" ? createSizeSchema : updateSizeSchema,
+      type === "create" ? createDesignSchema : updateDesignSchema,
     ),
     defaultValues: {
-      name: size?.name ?? "",
-      code: size?.code ?? "",
-      order: size?.order ?? 0,
-      active: size?.active ?? true,
+      name: design?.name ?? "",
+      code: design?.code ?? "",
+      description: design?.description ?? "",
+      active: design?.active ?? true,
     },
   });
 
@@ -81,33 +81,33 @@ export function SizeSheet({ type, size, ...props }: SizeSheetProps) {
       form.reset({
         name: "",
         code: "",
-        order: 0,
+        description: "",
         active: true,
       });
-    } else if (size) {
+    } else if (design) {
       form.reset({
-        name: size.name,
-        code: size.code,
-        order: size.order ?? 0,
-        active: size.active,
+        name: design.name,
+        code: design.code,
+        description: design.description ?? "",
+        active: design.active,
       });
     }
-  }, [form, size, type]);
+  }, [form, design, type]);
 
-  const onSubmit = async (values: CreateSizeSchema | UpdateSizeSchema) => {
+  const onSubmit = async (values: CreateDesignSchema | UpdateDesignSchema) => {
     if (type === "create") {
-      createSize(values as CreateSizeSchema, {
+      createDesign(values as CreateDesignSchema, {
         onSuccess: () => {
           form.reset();
           props.onOpenChange?.(false);
         },
       });
-    } else if (size) {
+    } else if (design) {
       const input = {
-        id: size.id,
+        id: design.id,
         ...values,
-      } as UpdateSizeActionSchema;
-      updateSize(input, {
+      } as UpdateDesignActionSchema;
+      updateDesign(input, {
         onSuccess: () => {
           form.reset();
           props.onOpenChange?.(false);
@@ -137,7 +137,7 @@ export function SizeSheet({ type, size, ...props }: SizeSheetProps) {
                     <FormItem>
                       <FormLabel>Nombre</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Nombre de la talla" />
+                        <Input {...field} placeholder="Nombre del diseño" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -152,7 +152,7 @@ export function SizeSheet({ type, size, ...props }: SizeSheetProps) {
                       <FormControl>
                         <Input
                           {...field}
-                          placeholder="Código de la talla (ej. M, L, XL)"
+                          placeholder="Código del diseño (ej. T-SHIRT-001)"
                         />
                       </FormControl>
                       <FormMessage />
@@ -161,18 +161,14 @@ export function SizeSheet({ type, size, ...props }: SizeSheetProps) {
                 />
                 <FormField
                   control={form.control}
-                  name="order"
+                  name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Orden</FormLabel>
+                      <FormLabel>Descripción</FormLabel>
                       <FormControl>
-                        <NumericOrderInput
-                          value={field.value ?? 0}
-                          onChange={field.onChange}
-                          min={1}
-                          max={9999}
-                          step={1}
-                          showBadge={false}
+                        <Textarea
+                          {...field}
+                          placeholder="Descripción del diseño"
                         />
                       </FormControl>
                       <FormMessage />
@@ -187,7 +183,7 @@ export function SizeSheet({ type, size, ...props }: SizeSheetProps) {
                       <FormLabel className="flex flex-col items-start gap-1">
                         <span>Activo</span>
                         <span className="font-normal text-muted-foreground">
-                          Mostrar esta talla en la tienda
+                          Mostrar este diseño en la tienda
                         </span>
                       </FormLabel>
                       <FormControl>

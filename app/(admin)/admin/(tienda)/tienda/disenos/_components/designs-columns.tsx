@@ -16,18 +16,18 @@ import {
 import { DataTableCellBoolean } from "@/components/ui/table/cells/data-table-cell-boolean";
 import { DataTableCellDate } from "@/components/ui/table/cells/data-table-cell-date";
 import { DataTableColumnHeader } from "@/components/ui/table/data-table-column-header";
-import { Size } from "@/db/schema";
+import { Design } from "@/db/schema";
 import { DataTableRowAction } from "@/types";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
-    React.SetStateAction<DataTableRowAction<Size> | null>
+    React.SetStateAction<DataTableRowAction<Design> | null>
   >;
 }
 
 export function getColumns({
   setRowAction,
-}: GetColumnsProps): ColumnDef<Size>[] {
+}: GetColumnsProps): ColumnDef<Design>[] {
   return [
     {
       id: "select",
@@ -56,7 +56,13 @@ export function getColumns({
     {
       accessorKey: "name",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Nombre de la talla" />
+        <DataTableColumnHeader column={column} title="Nombre del diseño" />
+      ),
+    },
+    {
+      accessorKey: "description",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Descripción" />
       ),
     },
     {
@@ -66,15 +72,6 @@ export function getColumns({
       ),
       cell: ({ row }) => (
         <code className="rounded bg-muted px-2 py-1">{row.original.code}</code>
-      ),
-    },
-    {
-      accessorKey: "order",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Orden" />
-      ),
-      cell: ({ row }) => (
-        <span className="text-muted-foreground">{row.original.order}</span>
       ),
     },
     {

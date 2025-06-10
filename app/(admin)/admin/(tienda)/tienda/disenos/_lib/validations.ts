@@ -1,3 +1,4 @@
+import { desc } from "drizzle-orm";
 import {
   createSearchParamsCache,
   parseAsArrayOf,
@@ -8,7 +9,7 @@ import {
 } from "nuqs/server";
 import { z } from "zod";
 
-import { Size } from "@/db/schema";
+import { Design } from "@/db/schema";
 import { getFiltersStateParser, getSortingStateParser } from "@/lib/parsers";
 
 export const searchParamsCache = createSearchParamsCache({
@@ -17,11 +18,12 @@ export const searchParamsCache = createSearchParamsCache({
   ),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
-  sort: getSortingStateParser<Size>().withDefault([
+  sort: getSortingStateParser<Design>().withDefault([
     { id: "createdAt", desc: true },
   ]),
   name: parseAsString.withDefault(""),
   code: parseAsString.withDefault(""),
+  description: parseAsString.withDefault(""),
   active: parseAsBoolean.withDefault(true),
   from: parseAsString.withDefault(""),
   to: parseAsString.withDefault(""),
@@ -29,27 +31,23 @@ export const searchParamsCache = createSearchParamsCache({
   joinOperator: parseAsStringEnum(["and", "or"]).withDefault("and"),
 });
 
-export const createSizeSchema = z.object({
-  name: z.string().min(1, "El nombre de la talla es obligatorio"),
-  code: z.string().min(1, "El código de la talla es obligatorio"),
-  order: z
-    .number()
-    .int()
-    .min(0, "El orden debe ser un número entero positivo")
-    .optional(),
+export const createDesignSchema = z.object({
+  name: z.string().min(1, "El nombre del diseño es obligatorio"),
+  code: z.string().min(1, "El código del diseño es obligatorio"),
+  description: z.string().optional(),
   active: z.boolean().optional(),
 });
 
-export const updateSizeSchema = createSizeSchema.partial();
-export type CreateSizeSchema = z.infer<typeof createSizeSchema>;
-export type UpdateSizeSchema = z.infer<typeof updateSizeSchema>;
-export type GetSizesSchema = Awaited<
+export const updateDesignSchema = createDesignSchema.partial();
+export type CreateDesignSchema = z.infer<typeof createDesignSchema>;
+export type UpdateDesignSchema = z.infer<typeof updateDesignSchema>;
+export type GetDesignsSchema = Awaited<
   ReturnType<typeof searchParamsCache.parse>
 >;
 
-export const updateSizeActionSchema = z.object({
+export const updateDesignActionSchema = z.object({
   id: z.string(),
-  ...updateSizeSchema.shape,
+  ...updateDesignSchema.shape,
 });
 
-export type UpdateSizeActionSchema = z.infer<typeof updateSizeActionSchema>;
+export type UpdateDesignActionSchema = z.infer<typeof updateDesignActionSchema>;

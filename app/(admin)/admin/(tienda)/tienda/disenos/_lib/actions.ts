@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { ERRORS, SUCCESS_MESSAGES } from "@/constants/messages";
 import db from "@/db/drizzle";
-import { sizes, UserRoleValues } from "@/db/schema";
+import { designs, UserRoleValues } from "@/db/schema";
 import { takeFirstOrThrow } from "@/db/utils";
 import {
   ActionContext,
@@ -18,70 +18,70 @@ import {
 } from "@/lib/middleware";
 import { AppError } from "@/lib/utils.api";
 import {
-  createSizeSchema,
-  CreateSizeSchema,
-  updateSizeActionSchema,
-  UpdateSizeActionSchema,
+  createDesignSchema,
+  CreateDesignSchema,
+  updateDesignActionSchema,
+  UpdateDesignActionSchema,
 } from "./validations";
 
-async function createSizeBase(
-  input: CreateSizeSchema,
+async function createDesignBase(
+  input: CreateDesignSchema,
   ctx: ActionContext = {},
 ) {
   if (!ctx.session?.user?.id) throw new AppError(ERRORS.UNAUTHENTICATED);
 
-  const size = await db.transaction(async (tx) => {
-    const existingSize = await tx
-      .select({ id: sizes.id })
-      .from(sizes)
-      .where(eq(sizes.code, input.code))
+  const design = await db.transaction(async (tx) => {
+    const existingDesign = await tx
+      .select({ id: designs.id })
+      .from(designs)
+      .where(eq(designs.code, input.code))
       .then((rows) => rows[0]);
 
-    if (existingSize) throw new AppError(ERRORS.SIZE_ALREADY_EXISTS);
+    if (existingDesign) throw new AppError(ERRORS.DESIGN_ALREADY_EXISTS);
 
     return tx
-      .insert(sizes)
+      .insert(designs)
       .values({
         name: input.name,
         code: input.code,
-        order: input.order ?? 0,
+        description: input.description,
         active: input.active ?? true,
       })
       .returning()
       .then(takeFirstOrThrow);
   });
 
-  revalidateTag("sizes");
-  revalidateTag("sizes-count");
+  revalidateTag("designs");
+  revalidateTag("designs-count");
 
   return {
-    data: size,
-    message: SUCCESS_MESSAGES.SIZE_CREATED,
+    data: design,
+    message: SUCCESS_MESSAGES.DESIGN_CREATED,
   };
 }
 
-async function updateSizeBase(
-  input: UpdateSizeActionSchema,
+async function updateDesignBase(
+  input: UpdateDesignActionSchema,
   ctx: ActionContext = {},
 ) {
   if (!ctx.session?.user?.id) throw new AppError(ERRORS.UNAUTHENTICATED);
 
   if (input.code) {
-    const existingSize = await db
-      .select({ id: sizes.id })
-      .from(sizes)
-      .where(eq(sizes.code, input.code))
+    const existingDesign = await db
+      .select({ id: designs.id })
+      .from(designs)
+      .where(eq(designs.code, input.code))
       .then((rows) => rows[0]);
 
-    if (existingSize && existingSize.id !== input.id) {
-      throw new AppError(ERRORS.SIZE_ALREADY_EXISTS);
+    if (existingDesign && existingDesign.id !== input.id) {
+      throw new AppError(ERRORS.DESIGN_ALREADY_EXISTS);
     }
   }
 
   const updateData = {
     name: input.name,
     code: input.code,
-    order: input.order,
+    description: input.description,
     active: input.active,
     updatedAt: new Date(),
   };
@@ -90,49 +90,49 @@ async function updateSizeBase(
     Object.entries(updateData).filter(([_, v]) => v !== undefined),
   );
 
-  const size = await db
-    .update(sizes)
+  const design = await db
+    .update(designs)
     .set(cleanUpdateData)
-    .where(eq(sizes.id, input.id))
+    .where(eq(designs.id, input.id))
     .returning()
     .then(takeFirstOrThrow);
 
-  revalidateTag("sizes");
-  revalidateTag("sizes-count");
+  revalidateTag("designs");
+  revalidateTag("designs-count");
 
   return {
-    data: size,
-    message: SUCCESS_MESSAGES.SIZE_UPDATED,
+    data: design,
+    message: SUCCESS_MESSAGES.DESIGN_UPDATED,
   };
 }
 
-async function deleteSizeBase(
+async function deleteDesignBase(
   input: { ids: string[] },
   ctx: ActionContext = {},
 ) {
   if (!ctx.session?.user?.id) throw new AppError(ERRORS.UNAUTHENTICATED);
 
   await db
-    .update(sizes)
+    .update(designs)
     .set({ active: false, updatedAt: new Date() })
-    .where(inArray(sizes.id, input.ids));
+    .where(inArray(designs.id, input.ids));
 
-  revalidateTag("sizes");
-  revalidateTag("sizes-count");
+  revalidateTag("designs");
+  revalidateTag("designs-count");
 
   return {
-    message: SUCCESS_MESSAGES.SIZE_DELETED,
+    message: SUCCESS_MESSAGES.DESIGN_DELETED,
   };
 }
 
-export const createSize = composeMiddleware<
-  CreateSizeSchema,
-  Awaited<ReturnType<typeof createSizeBase>>
+export const createDesign = composeMiddleware<
+  CreateDesignSchema,
+  Awaited<ReturnType<typeof createDesignBase>>
 >(
   withErrorHandling(),
   withValidation({
-    schema: createSizeSchema,
-    errorMessage: "Datos de talla inválidos",
+    schema: createDesignSchema,
+    errorMessage: "Datos de diseño inválidos",
   }),
   withAuth({
     requiredRole: [UserRoleValues.ADMIN, UserRoleValues.SUPER_ADMIN],
@@ -141,16 +141,16 @@ export const createSize = composeMiddleware<
     requests: 10,
     duration: "1m",
   }),
-)(createSizeBase);
+)(createDesignBase);
 
-export const updateSize = composeMiddleware<
-  UpdateSizeActionSchema,
-  Awaited<ReturnType<typeof updateSizeBase>>
+export const updateDesign = composeMiddleware<
+  UpdateDesignActionSchema,
+  Awaited<ReturnType<typeof updateDesignBase>>
 >(
   withErrorHandling(),
   withValidation({
-    schema: updateSizeActionSchema,
-    errorMessage: "Datos de talla inválidos",
+    schema: updateDesignActionSchema,
+    errorMessage: "Datos de diseño inválidos",
   }),
   withAuth({
     requiredRole: [UserRoleValues.ADMIN, UserRoleValues.SUPER_ADMIN],
@@ -159,18 +159,18 @@ export const updateSize = composeMiddleware<
     requests: 10,
     duration: "1m",
   }),
-)(updateSizeBase);
+)(updateDesignBase);
 
-export const deleteSizes = composeMiddleware<
+export const deleteDesigns = composeMiddleware<
   { ids: string[] },
-  Awaited<ReturnType<typeof deleteSizeBase>>
+  Awaited<ReturnType<typeof deleteDesignBase>>
 >(
   withErrorHandling(),
   withValidation({
     schema: z.object({
-      ids: z.array(z.string()).min(1, "Debe seleccionar al menos una talla"),
+      ids: z.array(z.string()).min(1, "Debe seleccionar al menos un diseño"),
     }),
-    errorMessage: "Datos de talla inválidos",
+    errorMessage: "Datos de diseño inválidos",
   }),
   withAuth({
     requiredRole: [UserRoleValues.ADMIN, UserRoleValues.SUPER_ADMIN],
@@ -179,4 +179,4 @@ export const deleteSizes = composeMiddleware<
     requests: 10,
     duration: "1m",
   }),
-)(deleteSizeBase);
+)(deleteDesignBase);

@@ -974,6 +974,7 @@ export type User = typeof users.$inferSelect;
 export type Category = typeof categories.$inferSelect;
 export type Size = typeof sizes.$inferSelect;
 export type Color = typeof colors.$inferSelect;
+export type Design = typeof designs.$inferSelect;
 export type Subcategory = typeof subcategories.$inferSelect;
 export type UserRoleType = (typeof userRole.enumValues)[number];
 

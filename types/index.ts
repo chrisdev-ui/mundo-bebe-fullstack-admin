@@ -14,6 +14,7 @@ import { MODULES } from "@/constants";
 import {
   categories,
   colors,
+  designs,
   sizes,
   subcategories,
   UserRoleType,
@@ -141,6 +142,7 @@ export type DbTables = {
   subcategories: typeof subcategories;
   sizes: typeof sizes;
   colors: typeof colors;
+  designs: typeof designs;
 };
 
 export type DataTableMappings = {

@@ -1,6 +1,7 @@
 import {
   IconBabyBottle,
   IconBrandTrello,
+  IconBrush,
   IconBuildingStore,
   IconCategory,
   IconCategory2,
@@ -47,5 +48,6 @@ export const Icons = {
   subcategory: IconCategory2,
   size: IconRuler2,
   color: IconPalette,
+  design: IconBrush,
   mundobebe: null,
 };
