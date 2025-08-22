@@ -15,6 +15,7 @@ import {
   categories,
   colors,
   designs,
+  productTypes,
   sizes,
   subcategories,
   UserRoleType,
@@ -143,6 +144,7 @@ export type DbTables = {
   sizes: typeof sizes;
   colors: typeof colors;
   designs: typeof designs;
+  productTypes: typeof productTypes;
 };
 
 export type DataTableMappings = {

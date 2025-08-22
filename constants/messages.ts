@@ -43,6 +43,7 @@ export const ERRORS = {
   SIZE_NOT_FOUND: "Talla no encontrada",
   COLOR_ALREADY_EXISTS: "Ya existe un color con este código",
   DESIGN_ALREADY_EXISTS: "Ya existe un diseño con este código",
+  PRODUCT_TYPE_ALREADY_EXISTS: "Ya existe un tipo de producto con este código",
 
   // Generic errors
   INTERNAL_SERVER_ERROR:
@@ -77,4 +78,7 @@ export const SUCCESS_MESSAGES = {
   DESIGN_CREATED: "¡Diseño creado con éxito! 🚀",
   DESIGN_UPDATED: "¡Diseño actualizado con éxito! 🚀",
   DESIGN_DELETED: "Diseño(s) eliminado(s) exitosamente ✅",
+  PRODUCT_TYPE_CREATED: "¡Tipo de producto creado con éxito! 🚀",
+  PRODUCT_TYPE_UPDATED: "¡Tipo de producto actualizado con éxito! 🚀",
+  PRODUCT_TYPE_DELETED: "Tipo(s) de producto eliminado(s) exitosamente ✅",
 } as const;

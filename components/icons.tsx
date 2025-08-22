@@ -15,6 +15,7 @@ import {
   IconPassword,
   IconRuler2,
   IconShield,
+  IconTag,
   IconTrash,
   IconUser,
   IconUserEdit,
@@ -49,5 +50,6 @@ export const Icons = {
   size: IconRuler2,
   color: IconPalette,
   design: IconBrush,
+  productType: IconTag,
   mundobebe: null,
 };

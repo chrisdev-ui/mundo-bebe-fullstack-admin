@@ -124,6 +124,13 @@ export const columnLabelMappings: DataTableMappings = {
     active: "Activo",
     createdAt: "Fecha de creación",
   },
+  productTypes: {
+    name: "Nombre del tipo",
+    code: "Código",
+    description: "Descripción",
+    active: "Activo",
+    createdAt: "Fecha de creación",
+  },
 };
 
 export const MODULES = ["admin", "super-admin", "user", "guest"] as const;
@@ -214,6 +221,13 @@ export const navItems: NavItem[] = [
         isActive: false,
         accessLevel: [UserRoleValues.ADMIN],
       },
+      {
+        title: "Tipos de producto",
+        url: "/admin/tienda/tipos-producto",
+        icon: "productType",
+        isActive: false,
+        accessLevel: [UserRoleValues.ADMIN],
+      },
     ],
   },
   {
@@ -272,6 +286,8 @@ export enum AdminPaths {
   SUBCATEGORIES = "/admin/tienda/subcategorias",
   SIZES = "/admin/tienda/tallas",
   COLORS = "/admin/tienda/colores",
+  DESIGNS = "/admin/tienda/disenos",
+  PRODUCT_TYPES = "/admin/tienda/tipos-producto",
 }
 
 export enum AuthPaths {
