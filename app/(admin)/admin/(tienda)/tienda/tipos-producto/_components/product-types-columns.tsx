@@ -79,7 +79,7 @@ export function getColumns({
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Estado" />
       ),
-      cell: ({ row }) => <DataTableCellBoolean value={row.original.active} />,
+      cell: ({ row }) => <DataTableCellBoolean value={!!row.original.active} />,
       filterFn: (row, id, value) => {
         return value === "true" ? row.getValue(id) : !row.getValue(id);
       },

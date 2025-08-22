@@ -34,9 +34,8 @@ export function ProductTypesTable({ promises }: ProductTypesTableProps) {
 
   const [{ data, pageCount }, productTypeCounts] = use(promises);
 
-  const [rowAction, setRowAction] = useState<DataTableRowAction<ProductType> | null>(
-    null,
-  );
+  const [rowAction, setRowAction] =
+    useState<DataTableRowAction<ProductType> | null>(null);
 
   const columns = useMemo(() => getColumns({ setRowAction }), []);
 
@@ -133,19 +132,25 @@ export function ProductTypesTable({ promises }: ProductTypesTableProps) {
         {enableAdvancedTable ? (
           <DataTableAdvancedToolbar
             table={table}
-            tableName="product-types"
+            tableName="productTypes"
             filterFields={advancedFilterFields}
             shallow={false}
           >
-            <ProductTypesToolbarActions table={table} setRowAction={setRowAction} />
+            <ProductTypesToolbarActions
+              table={table}
+              setRowAction={setRowAction}
+            />
           </DataTableAdvancedToolbar>
         ) : (
           <DataTableToolbar
             table={table}
-            tableName="product-types"
+            tableName="productTypes"
             filterFields={filterFields}
           >
-            <ProductTypesToolbarActions table={table} setRowAction={setRowAction} />
+            <ProductTypesToolbarActions
+              table={table}
+              setRowAction={setRowAction}
+            />
           </DataTableToolbar>
         )}
       </DataTable>
