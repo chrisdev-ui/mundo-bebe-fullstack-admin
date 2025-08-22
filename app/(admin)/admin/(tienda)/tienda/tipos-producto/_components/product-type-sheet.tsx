@@ -27,7 +27,10 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { ProductType } from "@/db/schema";
-import { useCreateProductType, useUpdateProductType } from "../_hooks/product-types";
+import {
+  useCreateProductType,
+  useUpdateProductType,
+} from "../_hooks/product-types";
 import {
   createProductTypeSchema,
   CreateProductTypeSchema,
@@ -36,7 +39,8 @@ import {
   UpdateProductTypeSchema,
 } from "../_lib/validations";
 
-interface ProductTypeSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
+interface ProductTypeSheetProps
+  extends React.ComponentPropsWithRef<typeof Sheet> {
   type: "create" | "update";
   productType: ProductType | null;
 }
@@ -58,9 +62,15 @@ const messages: Record<"create" | "update", Record<string, string>> = {
   },
 };
 
-export function ProductTypeSheet({ type, productType, ...props }: ProductTypeSheetProps) {
-  const { mutate: createProductType, isPending: isCreating } = useCreateProductType();
-  const { mutate: updateProductType, isPending: isUpdating } = useUpdateProductType();
+export function ProductTypeSheet({
+  type,
+  productType,
+  ...props
+}: ProductTypeSheetProps) {
+  const { mutate: createProductType, isPending: isCreating } =
+    useCreateProductType();
+  const { mutate: updateProductType, isPending: isUpdating } =
+    useUpdateProductType();
 
   const isPending = isCreating || isUpdating;
 
@@ -89,12 +99,14 @@ export function ProductTypeSheet({ type, productType, ...props }: ProductTypeShe
         name: productType.name,
         code: productType.code,
         description: productType.description ?? "",
-        active: productType.active,
+        active: productType.active ?? true,
       });
     }
   }, [form, productType, type]);
 
-  const onSubmit = async (values: CreateProductTypeSchema | UpdateProductTypeSchema) => {
+  const onSubmit = async (
+    values: CreateProductTypeSchema | UpdateProductTypeSchema,
+  ) => {
     if (type === "create") {
       createProductType(values as CreateProductTypeSchema, {
         onSuccess: () => {
@@ -137,7 +149,10 @@ export function ProductTypeSheet({ type, productType, ...props }: ProductTypeShe
                     <FormItem>
                       <FormLabel>Nombre</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="Nombre del tipo de producto" />
+                        <Input
+                          {...field}
+                          placeholder="Nombre del tipo de producto"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
